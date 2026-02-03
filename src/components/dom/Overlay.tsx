@@ -359,22 +359,6 @@ export function Overlay() {
 
                 </section>
 
-                {/* 5. FOOTER: GOLDEN HOUR (Center) */}
-                <section className="h-screen w-full flex flex-col items-center justify-center relative">
-                    <h2 className="text-[15vw] font-black text-center leading-none text-transparent bg-clip-text bg-linear-to-b from-orange-500 to-red-900 mix-blend-overlay opacity-80">
-                        THE END
-                    </h2>
-                    <div className="absolute bottom-12 flex flex-col items-center gap-4">
-                        <div className="flex gap-8 text-sm uppercase tracking-widest font-bold">
-                            <a href="#" className="hover:text-cyan-400 transition-colors">GitHub</a>
-                            <a href="#" className="hover:text-cyan-400 transition-colors">Twitter</a>
-                            <a href="#" className="hover:text-cyan-400 transition-colors">Mail</a>
-                        </div>
-                        <p className="text-xs text-white/30 font-mono">
-                            © 2026 CONSOLE LOGS BY TEJA
-                        </p>
-                    </div>
-                </section>
             </main>
         </>
     )

@@ -11,7 +11,7 @@ const SunMaterial = shaderMaterial(
   {
     uTime: 0,
     uScroll: 0,
-    uColorPoints: new THREE.Color('#000000'),
+    uState: 0, // 0: IDLE, 1: CHARGING, 2: CRITICAL
   },
   // Vertex Shader
   `
@@ -21,6 +21,7 @@ const SunMaterial = shaderMaterial(
     varying float vNoise;
     uniform float uTime;
     uniform float uScroll;
+    uniform float uState; // Used for vertex chaos if needed
 
     // Simplex Noise (Keeping original function or optimized one)
     vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -86,6 +87,12 @@ const SunMaterial = shaderMaterial(
       float noiseFreq = mix(2.5, 1.0, uScroll); // 2.5 -> 1.0
       float noiseAmp  = mix(0.4, 0.1, uScroll);  // 0.4 -> 0.1
       
+      // CRITICAL STATE OVERRIDES
+      if (uState > 1.5) { // CRITICAL
+         noiseFreq = 3.0; // High chaos
+         noiseAmp = 0.3; // Distorted
+      }
+      
       // Make it boil faster at higher scroll?
       float timeSpeed = 0.5 + uScroll * 0.5;
       
@@ -93,9 +100,6 @@ const SunMaterial = shaderMaterial(
       vNoise = noise; // Pass to frag
       
       // Displacement
-      // If scroll is near 0.0, we want chaotic spikes
-      // If scroll is near 1.0, we want uniform sphere
-      
       vec3 pos = position + normal * noise * noiseAmp;
       
       vPosition = pos;
@@ -110,6 +114,7 @@ const SunMaterial = shaderMaterial(
     varying float vNoise;
     uniform float uTime;
     uniform float uScroll;
+    uniform float uState; // 0: IDLE, 1: CHARGING, 2: CRITICAL
 
     void main() {
       vec3 viewDir = normalize(cameraPosition - vPosition);
@@ -144,11 +149,31 @@ const SunMaterial = shaderMaterial(
         finalRim  = mix(colMid, colEnd, t);
       }
       
-      // Composition
+      // STANDARD COLOR
       vec3 color = mix(finalCore, finalRim, fresnel + vNoise * 0.2);
       
-      // Add "heat" glow
-      color += vec3(fresnel * 0.5);
+      // --- STATE OVERRIDES ---
+      vec3 violetCore = vec3(0.2, 0.0, 0.4);
+      vec3 violetRim = vec3(0.6, 0.2, 1.0); // Electric Violet
+      
+      float emissiveIntensity = 0.0;
+      
+      if (uState > 0.5 && uState < 1.5) {
+         // CHARGING: Pulse Purple
+         color = mix(color, violetRim, 0.5 + sin(uTime * 10.0) * 0.2);
+         emissiveIntensity = 0.5; // Prompt Req: 0.5
+      } else if (uState > 1.5) {
+         // CRITICAL: Deep Violet / Black High Contrast
+         color = mix(violetCore, violetRim, fresnel * 2.0); 
+         color += vec3(0.4, 0.0, 1.0) * (vNoise * 3.0); // Lightning
+         emissiveIntensity = 2.0; // Prompt Req: 2.0
+      }
+      
+      // Add "heat" glow (base fresnel) adjusted by usage
+      // Prompt says IDLE Emissive = 0. So we keep base color only.
+      // We add the emissive glow on top
+      
+      color += violetRim * emissiveIntensity * fresnel;
 
       gl_FragColor = vec4(color, 1.0);
     }
@@ -166,16 +191,13 @@ declare global {
   }
 }
 
-export function Sun() {
+export function Sun({ footerState }: { footerState?: string }) {
   const meshRef = useRef<THREE.Mesh>(null)
   const materialRef = useRef<any>(null)
 
-  // Local scroll tracking
-  const scrollData = useRef({
-    current: 0,
-    target: 0,
-    last: 0
-  })
+  // Track rotation manually to prevent jumps when speed changes
+  const rotationY = useRef(0)
+  const rotationX = useRef(0)
 
   useFrame((state, delta) => {
     if (!materialRef.current || !meshRef.current) return
@@ -188,9 +210,22 @@ export function Sun() {
     // DIRECT: No damping for offset
     const offset = rawProgress
 
+    // Determine numeric state for shader
+    let stateNum = 0
+    if (footerState === 'CHARGING') stateNum = 1
+    if (footerState === 'CRITICAL') stateNum = 2
+
+    // Pass to shader
+    materialRef.current.uState = stateNum
+
     // Time & Scroll Uniforms
     // Slow internal boiling
-    materialRef.current.uTime = state.clock.elapsedTime * 0.1
+    // Speed up boiling if charging or critical
+    let boilSpeed = 0.1
+    if (footerState === 'CHARGING') boilSpeed = 0.5
+    if (footerState === 'CRITICAL') boilSpeed = 2.0
+
+    materialRef.current.uTime = state.clock.elapsedTime * boilSpeed
     materialRef.current.uScroll = offset
 
     // --- 1. PLANETARY REVOLUTION (X-Axis Position) ---
@@ -243,18 +278,19 @@ export function Sun() {
     meshRef.current.position.z = THREE.MathUtils.lerp(meshRef.current.position.z, targetZ, 0.2)
 
     // --- 2. THE ROTATION (Spin) ---
-    // Decent, slow majestic rotation
-    meshRef.current.rotation.y = state.clock.elapsedTime * 0.02
-    meshRef.current.rotation.x = state.clock.elapsedTime * 0.01
+    // If charging, spin violently (high speed accumulator)
+    // Normal: 0.2 rad/s approx
+    // Charging: 5.0 base speed.
+    // Critical: 20.0 base speed
+    let spinSpeed = 0.2
+    if (footerState === 'CHARGING') spinSpeed = 5.0
+    if (footerState === 'CRITICAL') spinSpeed = 20.0
 
-    // --- 3. THE MORPH (Color & Shape) ---
-    // We send 'uScroll' to shader, but let's pre-calculate some lerps here if needed
-    // Actually, shader handles the morph best.
+    rotationY.current += delta * spinSpeed
+    rotationX.current += delta * (spinSpeed * 0.5)
 
-    // However, let's pass specific colors to uniform if variable
-    // Phase 1: White Explosion (Spiky)
-    // Phase 2: Cyan Structural (Smooth)
-    // Phase 3: Magma Red (Boiling)
+    meshRef.current.rotation.y = rotationY.current
+    meshRef.current.rotation.x = rotationX.current
   })
 
   return (

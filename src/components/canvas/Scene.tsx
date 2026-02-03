@@ -5,7 +5,10 @@ import { Preload } from '@react-three/drei'
 import { Suspense } from 'react'
 import { Sun } from './Sun'
 
-export function Scene() {
+import { ParticleReactor } from './ParticleReactor'
+
+export function Scene({ footerState }: { footerState?: string }) {
+    // Pass full state string to children for multi-stage logic (IDLE, CHARGING, CRITICAL)
     return (
         <div className="h-screen w-full relative">
             <Canvas
@@ -15,7 +18,8 @@ export function Scene() {
                 dpr={[1, 1.5]} // Optimize for performance
             >
                 <Suspense fallback={null}>
-                    <Sun />
+                    <Sun footerState={footerState} />
+                    <ParticleReactor footerState={footerState || 'IDLE'} />
                     <Preload all />
                 </Suspense>
             </Canvas>

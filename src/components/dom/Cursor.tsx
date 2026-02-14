@@ -38,7 +38,7 @@ export function Cursor() {
         const cursor = cursorRef.current
         if (!cursor) return
 
-        const targets = document.querySelectorAll('a, button, input, textarea, .interactive')
+        const targets = document.querySelectorAll('a:not(.no-cursor-magnify), button:not(.no-cursor-magnify), input:not(.no-cursor-magnify), textarea:not(.no-cursor-magnify), .interactive:not(.no-cursor-magnify)')
 
         const onMouseEnter = (e: Event) => {
             setIsHovering(true)

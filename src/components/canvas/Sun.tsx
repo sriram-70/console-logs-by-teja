@@ -12,6 +12,7 @@ const SunMaterial = shaderMaterial(
     uTime: 0,
     uScroll: 0,
     uState: 0, // 0: IDLE, 1: CHARGING, 2: CRITICAL
+    uIsWizard: 0, // 0: False, 1: True
   },
   // Vertex Shader
   `
@@ -22,6 +23,7 @@ const SunMaterial = shaderMaterial(
     uniform float uTime;
     uniform float uScroll;
     uniform float uState; // Used for vertex chaos if needed
+    uniform float uIsWizard;
 
     // Simplex Noise (Keeping original function or optimized one)
     vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -115,6 +117,7 @@ const SunMaterial = shaderMaterial(
     uniform float uTime;
     uniform float uScroll;
     uniform float uState; // 0: IDLE, 1: CHARGING, 2: CRITICAL
+    uniform float uIsWizard;
 
     void main() {
       vec3 viewDir = normalize(cameraPosition - vPosition);
@@ -151,29 +154,65 @@ const SunMaterial = shaderMaterial(
       
       // STANDARD COLOR
       vec3 color = mix(finalCore, finalRim, fresnel + vNoise * 0.2);
+
+      // --- WIZARD OVERRIDE (Rich / Vampire / Vantablack) ---
+      if (uIsWizard > 0.5) {
+         // Vantablack Core (Absorbs light)
+         vec3 vantaBlack = vec3(0.001, 0.001, 0.001); 
+         
+         // Vampire Black (Deep Reddish/warm Black) - #080402 approx
+         vec3 vampireBlack = vec3(0.03, 0.015, 0.01);
+         
+         // Rich Black (Cooler, slightly blueish) - #010203 approx
+         vec3 richBlack = vec3(0.01, 0.02, 0.03);
+         
+         // Mix pattern:
+         // Core is Vantablack (Deepest void)
+         // Mids are Vampire Black (Subtle warmth in noise)
+         // Rim is Rich Black (Reflecting environment)
+         
+         // 1. Base mix on Noise (Texture)
+         vec3 baseMix = mix(vantaBlack, vampireBlack, vNoise * 0.5 + 0.5);
+         
+         // 2. Add Fresnel Rim (Rich Black gloss)
+         // Sharper fresnel for glossy "Alien" look, or softer for matte? 
+         // "Vantablack" implies matte, but "Object" usually needs definition.
+         // Let's go with a subtle, glossy Rich Black rim.
+         
+         float rim = pow(fresnel, 4.0); // Tighter rim
+         color = mix(baseMix, richBlack, rim * 0.8);
+         
+         // 3. Add deep specular highlights?
+         // Maybe a tiny bit of white specular for wet look
+         // color += vec3(0.1) * pow(fresnel, 8.0);
+      }
       
       // --- STATE OVERRIDES ---
-      vec3 violetCore = vec3(0.2, 0.0, 0.4);
-      vec3 violetRim = vec3(0.6, 0.2, 1.0); // Electric Violet
+      vec3 sunsetCore = vec3(0.5, 0.0, 0.0); // Deep Red Core
+      vec3 goldenRim = vec3(1.0, 0.6, 0.0); // Golden Orange Rim
       
       float emissiveIntensity = 0.0;
       
       if (uState > 0.5 && uState < 1.5) {
-         // CHARGING: Pulse Purple
-         color = mix(color, violetRim, 0.5 + sin(uTime * 10.0) * 0.2);
-         emissiveIntensity = 0.5; // Prompt Req: 0.5
+         // CHARGING: Pulse Golden Orange
+         // Mix towards bright golden orange
+         color = mix(color, goldenRim, 0.5 + sin(uTime * 10.0) * 0.2);
+         emissiveIntensity = 0.5; 
       } else if (uState > 1.5) {
-         // CRITICAL: Deep Violet / Black High Contrast
-         color = mix(violetCore, violetRim, fresnel * 2.0); 
-         color += vec3(0.4, 0.0, 1.0) * (vNoise * 3.0); // Lightning
-         emissiveIntensity = 2.0; // Prompt Req: 2.0
+         // CRITICAL: Sunset Red / Magma Explosion
+         // Deep red core, Golden rim
+         color = mix(sunsetCore, goldenRim, fresnel * 2.0); 
+         // Add bright yellow/white lightning/embedded heat
+         color += vec3(1.0, 0.8, 0.2) * (vNoise * 3.0); 
+         emissiveIntensity = 2.0; 
       }
       
       // Add "heat" glow (base fresnel) adjusted by usage
       // Prompt says IDLE Emissive = 0. So we keep base color only.
       // We add the emissive glow on top
       
-      color += violetRim * emissiveIntensity * fresnel;
+      // Use GoldenRim for emissive coloring in active states
+      color += goldenRim * emissiveIntensity * fresnel;
 
       gl_FragColor = vec4(color, 1.0);
     }
@@ -271,6 +310,28 @@ export function Sun({ footerState }: { footerState?: string }) {
       targetX = 2.5 - (sectionP * 2.5) // 2.5 -> 0
       targetY = -1.5 * sectionP
       targetZ = 1 * sectionP
+    }
+
+    // --- FORM STATE OVERRIDE ---
+    if (footerState === 'FORM' || footerState === 'FLASH') {
+      // Force footer position and visual state
+      targetX = 0
+      targetY = -1.5
+      targetZ = 2.2 // Brought closer to camera (was 1) to appear bigger
+      // Force offset to 1.0 (Magma Red / Boiling)
+      // We can't re-assign const offset, so we used 'offset' variable in calculations above. 
+      // But 'offset' corresponds to uScroll uniform.
+      materialRef.current.uScroll = 1.0
+
+      // ENABLE WIZARD COLOR
+      materialRef.current.uIsWizard = 1.0
+    } else {
+      materialRef.current.uIsWizard = 0.0
+    }
+
+    // Pass to shader (Standard)
+    if (footerState !== 'FORM' && footerState !== 'FLASH') {
+      materialRef.current.uScroll = offset
     }
 
     const responsiveX = window.innerWidth < 768 ? 0 : targetX

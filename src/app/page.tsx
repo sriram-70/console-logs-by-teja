@@ -47,16 +47,23 @@ export default function Home() {
   return (
     <>
       <Atmosphere />
+      {/* FORM BACKGROUND (Behind Scene) */}
+      <div className={`fixed inset-0 bg-white z-[-1] transition-opacity duration-1000 ${['FLASH', 'FORM'].includes(footerState) ? 'opacity-100' : 'opacity-0'}`} />
+
       <div className="fixed inset-0 z-0">
         <Scene footerState={footerState} />
       </div>
+
       <div className="relative z-10">
-        <Overlay />
+        {/* Hide Overlay Content during Form */}
+        <div className={`transition-opacity duration-500 ${footerState === 'FORM' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          <Overlay />
+        </div>
 
         <footer id="contact" className="min-h-screen relative flex flex-col justify-end items-center pb-0 z-10 overflow-hidden">
 
           {/* 1. SOCIALS OUTPOST (Top Right - Per Sketch) */}
-          <div className="absolute top-10 right-[5vw] flex flex-col items-end gap-6 z-30">
+          <div className={`absolute top-10 right-[5vw] flex flex-col items-end gap-6 z-30 transition-opacity duration-300 ${footerState === 'FORM' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
             {[
               { name: 'INSTAGRAM', icon: Instagram, url: 'https://instagram.com' },
               { name: 'GITHUB', icon: Github, url: 'https://github.com' },
@@ -91,15 +98,17 @@ export default function Home() {
               onClick={initiateLaunch}
               suppressHydrationWarning
             >
-              <h2 className={`text-[12vw] font-black leading-none text-center transition-all duration-300 ${footerState === 'CRITICAL' ? 'text-violet-600 scale-110 animate-[shake_0.5s_ease-in-out_infinite]' : 'text-white mix-blend-overlay group-hover:text-black group-hover:scale-105'}`}>
+              <h2 className={`text-[12vw] font-black leading-none text-center transition-all duration-300 ${footerState === 'CRITICAL' ? 'text-[#FFD700] scale-110 animate-[shake_0.5s_ease-in-out_infinite]' : 'text-white mix-blend-overlay group-hover:text-[#ff3300] group-hover:mix-blend-normal group-hover:scale-105'}`}>
                 START A<br />PROJECT
               </h2>
             </button>
           </div>
 
+          {/* DEDICATED FLASH LAYER (Covers Scene initially) */}
+          <div className={`fixed inset-0 bg-white z-60 pointer-events-none transition-opacity duration-500 ease-out ${footerState === 'FLASH' ? 'opacity-100' : 'opacity-0'}`} />
 
-          {/* 3. THE FLASH & FORM (Solid White) */}
-          <div className={`fixed inset-0 bg-white z-70 flex items-center justify-center transition-opacity duration-100 ease-linear overflow-y-auto ${['FLASH', 'FORM'].includes(footerState) ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          {/* 3. THE FORM CONTAINER (Transparent - Content Only) */}
+          <div className={`fixed inset-0 bg-transparent z-70 flex items-center justify-center transition-opacity duration-100 ease-linear overflow-y-auto ${['FLASH', 'FORM'].includes(footerState) ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
             onTransitionEnd={() => { if (footerState === 'FLASH') { setFooterState('FORM'); setHeaderPosition('top-right'); } }}
           >
 
@@ -259,7 +268,7 @@ export default function Home() {
                       suppressHydrationWarning
                       type="button"
                       onClick={() => setFormStep(1)}
-                      className="w-1/3 py-6 border-b-2 border-black/10 hover:border-black text-black font-bold text-sm uppercase tracking-wider transition-all cursor-pointer"
+                      className="w-1/3 py-6 bg-white border-2 border-black text-black font-bold text-sm uppercase tracking-wider hover:bg-black hover:text-white transition-all cursor-pointer"
                     >
                       ← Back
                     </button>

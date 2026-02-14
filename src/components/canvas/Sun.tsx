@@ -230,11 +230,12 @@ export function Sun({ footerState }: { footerState?: string }) {
 
     // --- 1. PLANETARY REVOLUTION (X-Axis Position) ---
     // Sections Logic:
-    // 0.0 - 0.15: HERO (Center)
-    // 0.15 - 0.35: ABOUT (Right)
-    // 0.35 - 0.55: WORKS (Left)
-    // 0.55 - 0.75: SERVICES (Right)
-    // 0.75 - 1.00: FOOTER (Center)
+    // 0.00 - 0.15: HERO (Center)
+    // 0.15 - 0.30: ABOUT (Right)
+    // 0.30 - 0.45: SERVICES / WHAT I BRING (Right)
+    // 0.45 - 0.60: WORKS (Left)
+    // 0.60 - 0.75: TECH STACK (Right)
+    // 0.75 - 1.00: FOOTER (Center Down)
 
     let targetX = 0
     let targetY = 0
@@ -244,28 +245,30 @@ export function Sun({ footerState }: { footerState?: string }) {
       // Hero: Center
       targetX = 0
       targetZ = 0
-    } else if (offset < 0.35) {
-      // About: Move Right (Slide 0.15 -> 0.25)
-      const sectionP = (offset - 0.15) / 0.2
-      if (sectionP < 0.5) targetX = sectionP * 2 * 2.5
+    } else if (offset < 0.30) {
+      // About: Move Right (Slide 0.15 -> 0.20 - QUICKLY)
+      const sectionP = (offset - 0.15) / 0.05
+      if (sectionP < 1.0) targetX = sectionP * 2.5
       else targetX = 2.5
       targetZ = -1
-    } else if (offset < 0.55) {
-      // Works: Move Right -> Left (Slide 0.35 -> 0.45)
-      const sectionP = (offset - 0.35) / 0.2
-      if (sectionP < 0.5) targetX = 2.5 - (sectionP * 2 * 5.0)
-      else targetX = -2.5
+    } else if (offset < 0.45) {
+      // Services: Stay Right
+      targetX = 2.5
+      targetZ = -1
+    } else if (offset < 0.60) {
+      // Works: Move Right -> Left
+      const sectionP = (offset - 0.45) / 0.15
+      targetX = 2.5 - (sectionP * 5.0) // 2.5 -> -2.5
       targetZ = -0.5
     } else if (offset < 0.75) {
-      // Services: Move Left -> Right (Slide 0.55 -> 0.65)
-      const sectionP = (offset - 0.55) / 0.2
-      if (sectionP < 0.5) targetX = -2.5 + (sectionP * 2 * 5.0)
-      else targetX = 2.5
+      // Tech Stack: Move Left -> Right
+      const sectionP = (offset - 0.60) / 0.15
+      targetX = -2.5 + (sectionP * 5.0) // -2.5 -> 2.5
       targetZ = -1
     } else {
-      // Footer: Move Right -> Center (Slide 0.75 -> 1.0)
+      // Footer: Move Right -> Center Down
       const sectionP = (offset - 0.75) / 0.25
-      targetX = 2.5 - (sectionP * 2.5)
+      targetX = 2.5 - (sectionP * 2.5) // 2.5 -> 0
       targetY = -1.5 * sectionP
       targetZ = 1 * sectionP
     }

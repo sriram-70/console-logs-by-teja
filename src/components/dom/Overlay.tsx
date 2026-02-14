@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Skills } from '@/components/sections/Skills'
+
 
 export function Overlay() {
     const [loaded, setLoaded] = useState(false)
@@ -44,7 +46,6 @@ export function Overlay() {
                         v.2026.1 // SYSTEM_READY
                     </div>
                     {/* HERO TITLE GRID LOCK-UP */}
-                    {/* HERO TITLE GRID LOCK-UP */}
                     <div className="flex flex-col items-start w-max z-10 mix-blend-exclusion select-none cursor-default">
 
                         {/* ROW 1: THE ROOF (Defines block width) */}
@@ -86,19 +87,44 @@ export function Overlay() {
                             </div>
                         </div>
                     </div>
+
+                    {/* NEW: Value Proposition for Landing Pages */}
+                    <div className="mt-12 text-center max-w-3xl z-10">
+                        <p className="text-2xl md:text-3xl text-white/90 font-bold uppercase tracking-wide mb-4">
+                            High-Converting Landing Pages & Business Websites
+                        </p>
+                        <p className="text-base md:text-lg text-white/60 font-mono uppercase tracking-wider mb-8">
+                            Fast delivery • modern interactions • mobile first design
+                        </p>
+
+                        {/* Dual CTAs */}
+                        <div className="flex gap-4 justify-center flex-wrap">
+                            <a href="#contact" className="px-8 py-4 bg-white text-black font-black uppercase text-sm tracking-widest hover:bg-cyan-400 hover:text-black transition-all duration-300 cursor-none">
+                                Get a Quote →
+                            </a>
+                            <a href="#works" className="px-8 py-4 border-2 border-white text-white font-black uppercase text-sm tracking-widest hover:bg-white hover:text-black transition-all duration-300 cursor-none">
+                                View Projects
+                            </a>
+                        </div>
+
+                        {/* Quick Stats */}
+
+                    </div>
+
                     <div className="absolute bottom-12 animate-bounce">
                         <p className="text-xs uppercase tracking-[0.3em]">Scroll to Initialize</p>
                     </div>
                 </section>
 
-                {/* 2. ABOUT: KERNEL PANIC (Terminal Style) */}
-                <section id="about" className="min-h-screen flex items-center justify-start px-8 md:pl-[5vw] md:pr-[5vw] relative z-10 pointer-events-none">
+                {/* 2. ABOUT: Here’s a bit about me + What I bring to the table */}
+                {/* 2. ABOUT: Here’s a bit about me + What I bring to the table */}
+                <section id="about" className="min-h-screen mb-32 flex items-center justify-start px-8 md:pl-[5vw] md:pr-[5vw] relative z-10 pointer-events-none">
                     <div className="flex flex-col items-start gap-8 w-full md:w-3/5 pointer-events-auto">
 
                         {/* HEADER */}
                         <h2 className="text-[14vw] md:text-[8vw] font-black leading-[0.85] tracking-tighter text-white uppercase mix-blend-difference">
-                            KERNEL<br />
-                            <span className="text-white/40">PANIC?</span>
+                            DIGITAL<br />
+                            <span className="text-white/40">ALCHEMY</span>
                         </h2>
 
                         {/* LOG BODY */}
@@ -107,43 +133,162 @@ export function Overlay() {
                             {/* THE BRACKET TERMINAL */}
                             <div className="flex items-center gap-2 mb-4 font-mono text-sm tracking-widest text-emerald-500">
                                 <span className="text-white/30">[</span>
-
                                 <span className="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]">
-                                    SYSTEM_DIAGNOSIS
+                                    MISSION_PROFILE
                                 </span>
-
                                 <span className="animate-pulse text-emerald-400">_</span>
                                 <span className="text-white/30">]</span>
                             </div>
 
                             {/* PUNCHLINE */}
                             <p className="text-3xl md:text-5xl font-medium text-white leading-tight">
-                                No. Just controlled chaos.
+                                I build websites that get you customers, not just compliments.
                             </p>
 
                             {/* IDENTITY */}
                             <p className="text-xl md:text-2xl text-white/80 leading-relaxed max-w-xl">
-                                I am a <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] to-[#00FFFF]">Technical Artist</span>.
+                                Specialized in <span className="font-bold text-transparent bg-clip-text bg-linear-to-r from-[#FFD700] to-[#00FFFF]">Landing Pages</span> and <span className="font-bold text-transparent bg-clip-text bg-linear-to-r from-[#FFD700] to-[#00FFFF]">Business Websites</span> that convert.
                             </p>
 
                             {/* DESCRIPTION */}
                             <div className="flex flex-col gap-3 mt-2 font-mono text-xs md:text-base text-white/60 leading-relaxed">
-                                <p>&gt; I exist in the blur between &apos;Prompt&apos; and &apos;Product&apos;.</p>
-                                <p>&gt; I don&apos;t just write code; I orchestrate digital energy.</p>
-                                <p>&gt; Bridging the gap between cold silicon and human intuition to turn abstract &apos;what ifs&apos; into living realities.</p>
+                                <p>&gt; Perfect for small businesses, events, and quick-turnaround projects</p>
+                                <p>&gt; Modern design with interactive elements that make you stand out</p>
+                                <p>&gt; Fast delivery (1-2 weeks) without compromising quality</p>
+                                <p>&gt; Mobile-first, SEO-ready, conversion-optimized</p>
                             </div>
-
-                            {/* SIGN OFF */}
-                            <p className="text-lg md:text-xl text-white font-bold mt-6 tracking-tight">
-                                So hi, this is Teja.
-                            </p>
-
                         </div>
                     </div>
                 </section>
 
-                {/* 3. WORKS: RUNTIME_MOD (Interactive Gallery) */}
-                <section id="works" className="min-h-screen flex items-center justify-end px-8 md:pl-[5vw] md:pr-[5vw] relative z-10 pointer-events-none">
+                {/* 3. SERVICES: What I bring to the table */}
+                {/* 3. SERVICES: What I bring to the table */}
+                <section id="services" className="min-h-screen mb-32 flex items-center justify-start px-8 md:pl-[5vw] md:pr-[5vw] relative z-10 pointer-events-none">
+
+                    {/* CONTAINER */}
+                    <div className="flex flex-col items-start gap-12 w-full md:w-3/4 pointer-events-auto">
+
+                        {/* HEADER */}
+                        <div className="text-left mb-4">
+                            <h2 className="text-[14vw] md:text-[7vw] font-black leading-[0.85] tracking-tighter text-white uppercase mix-blend-difference">
+                                WHAT I<br />
+                                <span className="text-white/40">BRING_TO_TABLE</span>
+                            </h2>
+                        </div>
+
+                        {/* COLLAGE GRID */}
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 w-full">
+
+                            {/* ROW 1 */}
+                            {[
+                                {
+                                    id: '01',
+                                    title: 'LANDING PAGES',
+                                    stack: ['Next.js', 'Tailwind', 'Fast Delivery'],
+                                    desc: '// High-converting pages for products, services, events',
+                                    size: 'md:col-span-2'
+                                },
+                                {
+                                    id: '02',
+                                    title: 'BUSINESS WEBSITES',
+                                    stack: ['Multi-page', 'SEO-Ready', 'Mobile-First'],
+                                    desc: '// Professional sites for small businesses & startups',
+                                    size: 'md:col-span-3'
+                                }
+                            ].map((item) => (
+                                <button
+                                    key={item.id}
+                                    className={`${item.size} group relative flex flex-col justify-between p-6 md:p-8 bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-white/10 transition-all duration-300 text-left cursor-none`}
+                                    type="button"
+                                    suppressHydrationWarning
+                                >
+
+                                    {/* TOP: ID & ARROW */}
+                                    <div className="flex justify-between items-start w-full mb-8">
+                                        <span className="font-mono text-cyan-400 text-sm font-bold">{item.id}</span>
+                                        <span className="opacity-0 group-hover:opacity-100 text-cyan-400 text-xl transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
+                                            🡥
+                                        </span>
+                                    </div>
+
+                                    {/* MIDDLE: TITLE */}
+                                    <h3 className="text-2xl md:text-3xl font-bold text-white uppercase leading-none mb-4 group-hover:text-cyan-300 transition-colors">
+                                        {item.title}
+                                    </h3>
+
+                                    {/* BOTTOM: STACK & DESC */}
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex flex-wrap gap-2">
+                                            {item.stack.map((tech, i) => (
+                                                <span key={i} className="px-2 py-1 text-xs font-mono text-white font-semibold bg-white/10 border border-white/10 group-hover:border-cyan-400/30 group-hover:text-cyan-100 transition-colors">
+                                                    {tech}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        {/* High Visibility Description */}
+                                        <span className="font-mono text-sm text-emerald-400 font-medium mt-1">
+                                            {item.desc}
+                                        </span>
+                                    </div>
+                                </button>
+                            ))}
+
+                            {/* ROW 2 */}
+                            {[
+                                {
+                                    id: '03',
+                                    title: 'PORTFOLIO SITES',
+                                    stack: ['Modern Design', 'Interactive', 'Showcase'],
+                                    desc: '// Stand out with premium portfolio websites',
+                                    size: 'md:col-span-3'
+                                },
+                                {
+                                    id: '04',
+                                    title: 'INTERACTIVE ELEMENTS',
+                                    stack: ['Three.js', '3D Graphics', 'Animations'],
+                                    desc: '// Add wow-factor with 3D and interactive features',
+                                    size: 'md:col-span-2'
+                                }
+                            ].map((item) => (
+                                <button
+                                    key={item.id}
+                                    className={`${item.size} group relative flex flex-col justify-between p-6 md:p-8 bg-white/5 border border-white/10 hover:border-emerald-500/50 hover:bg-white/10 transition-all duration-300 rounded-lg text-left cursor-none`}
+                                    type="button"
+                                    suppressHydrationWarning
+                                >
+
+                                    <div className="flex justify-between items-start w-full mb-8">
+                                        <span className="font-mono text-emerald-500 text-sm font-bold">{item.id}</span>
+                                        <span className="opacity-0 group-hover:opacity-100 text-emerald-400 text-xl transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
+                                            🡥
+                                        </span>
+                                    </div>
+
+                                    <h3 className="text-2xl md:text-3xl font-bold text-white uppercase leading-none mb-4 group-hover:text-emerald-300 transition-colors">
+                                        {item.title}
+                                    </h3>
+
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex flex-wrap gap-2">
+                                            {item.stack.map((tech, i) => (
+                                                <span key={i} className="px-2 py-1 text-xs font-mono text-white font-semibold bg-white/10 rounded border border-white/10 group-hover:border-emerald-500/30 group-hover:text-emerald-100 transition-colors">
+                                                    {tech}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <span className="font-mono text-sm text-emerald-400 font-medium mt-1">
+                                            {item.desc}
+                                        </span>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* 4. WORKS: Take a look at my works */}
+                {/* 4. WORKS: Take a look at my works */}
+                <section id="works" className="min-h-screen mb-32 flex items-center justify-end px-8 md:pl-[5vw] md:pr-[5vw] relative z-10 pointer-events-none">
 
                     {/* CONTAINER: Aligned Right */}
                     <div className="flex flex-col items-end gap-12 w-full md:w-3/5 pointer-events-auto">
@@ -151,8 +296,8 @@ export function Overlay() {
                         {/* HEADER */}
                         <div className="text-right">
                             <h2 className="text-[14vw] md:text-[8vw] font-black leading-[0.85] tracking-tighter text-white uppercase mix-blend-difference">
-                                RUNTIME<br />
-                                <span className="text-white/40">_MOD</span>
+                                SELECTED<br />
+                                <span className="text-white/40">_WORKS</span>
                             </h2>
                         </div>
 
@@ -162,21 +307,21 @@ export function Overlay() {
                                 {
                                     id: '01',
                                     name: 'HOUSE OF FESTIVALS',
-                                    category: 'Event Architecture',
+                                    category: 'Event Landing Page',
                                     url: 'https://www.houseoffestivals.co.in/',
                                     img: '/houseoffestivals.co.in.png'
                                 },
                                 {
                                     id: '02',
                                     name: 'TOURNEY PLUS',
-                                    category: 'Esports Ecosystem',
+                                    category: 'SaaS Marketing Site',
                                     url: 'https://www.tourneyplus.xyz/',
                                     img: '/tourneyplus.xyz.png'
                                 },
                                 {
                                     id: '03',
                                     name: 'GK FINANCE',
-                                    category: 'Fintech Cloud SaaS',
+                                    category: 'Fintech Landing Page',
                                     url: 'https://gkfinance.cloud/',
                                     img: '/gkfinance.cloud.png'
                                 }
@@ -193,7 +338,6 @@ export function Overlay() {
                                     {/* HOVER REVEAL IMAGE (Floating Left of List) */}
                                     {activeProject === project.id && (
                                         <div className="absolute right-[110%] top-1/2 -translate-y-1/2 w-[300px] h-[200px] md:w-[400px] md:h-[250px] bg-zinc-900 rounded-lg overflow-hidden border border-white/20 shadow-2xl pointer-events-none z-50 animate-in fade-in zoom-in-95 duration-200 origin-right hidden md:block">
-                                            {/* IMAGE SOURCE MAPPED FROM ARRAY */}
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img src={project.img} alt={project.name} className="w-full h-full object-cover" />
 
@@ -222,142 +366,16 @@ export function Overlay() {
                     </div>
                 </section>
 
-                {/* 4. SERVICES: FUNCTIONS (Collage Grid) */}
-                <section id="skills" className="min-h-screen flex items-center justify-start px-8 md:pl-[5vw] md:pr-[5vw] relative z-10 pointer-events-none">
-
-                    {/* CONTAINER */}
-                    <div className="flex flex-col items-start gap-12 w-full md:w-3/4 pointer-events-auto">
-
-                        {/* HEADER */}
-                        <div className="text-left mb-4">
-                            <h2 className="text-[14vw] md:text-[7vw] font-black leading-[0.85] tracking-tighter text-white uppercase mix-blend-difference">
-                                AVAILABLE<br />
-                                <span className="text-white/40">_FUNCTIONS()</span>
-                            </h2>
-
-                            {/* TERMINAL BRACKET SUB-HEADER */}
-                            <div className="flex items-center gap-2 mt-6">
-                                <span className="text-emerald-500 font-mono text-xl font-bold">[</span>
-                                <span className="font-mono text-base md:text-lg text-emerald-400 font-bold tracking-widest uppercase shadow-emerald-500/50 drop-shadow-lg">
-                                    MVP DELIVERY PROTOCOLS
-                                </span>
-                                <span className="animate-pulse text-emerald-500 font-mono text-xl font-bold">_</span>
-                                <span className="text-emerald-500 font-mono text-xl font-bold">]</span>
-                            </div>
-                        </div>
-
-                        {/* COLLAGE GRID */}
-                        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 w-full">
-
-                            {/* ROW 1 */}
-                            {[
-                                {
-                                    id: 'fn.01',
-                                    title: 'CREATIVE DEVELOPMENT',
-                                    stack: ['React', 'Tailwind', 'Framer'],
-                                    desc: '// The blend of code & art',
-                                    size: 'md:col-span-2'
-                                },
-                                {
-                                    id: 'fn.02',
-                                    title: 'INTERACTIVE SYSTEMS',
-                                    stack: ['Three.js', 'R3F', 'GLSL Shaders', 'Physics'],
-                                    desc: '// 3D & Immersive logic',
-                                    size: 'md:col-span-3'
-                                }
-                            ].map((item) => (
-                                <button
-                                    key={item.id}
-                                    className={`${item.size} group relative flex flex-col justify-between p-6 md:p-8 bg-white/5 border border-white/10 hover:border-emerald-500/50 hover:bg-white/10 transition-all duration-300 rounded-lg text-left cursor-none`}
-                                    type="button" // Explicitly type button to fix cursor interaction
-                                >
-
-                                    {/* TOP: ID & ARROW */}
-                                    <div className="flex justify-between items-start w-full mb-8">
-                                        <span className="font-mono text-emerald-500 text-sm font-bold">{item.id}</span>
-                                        <span className="opacity-0 group-hover:opacity-100 text-emerald-400 text-xl transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
-                                            🡥
-                                        </span>
-                                    </div>
-
-                                    {/* MIDDLE: TITLE */}
-                                    <h3 className="text-2xl md:text-3xl font-bold text-white uppercase leading-none mb-4 group-hover:text-emerald-300 transition-colors">
-                                        {item.title}
-                                    </h3>
-
-                                    {/* BOTTOM: STACK & DESC */}
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex flex-wrap gap-2">
-                                            {item.stack.map((tech, i) => (
-                                                <span key={i} className="px-2 py-1 text-xs font-mono text-white font-semibold bg-white/10 rounded border border-white/10 group-hover:border-emerald-500/30 group-hover:text-emerald-100 transition-colors">
-                                                    {tech}
-                                                </span>
-                                            ))}
-                                        </div>
-                                        {/* High Visibility Description */}
-                                        <span className="font-mono text-sm text-emerald-400 font-medium mt-1">
-                                            {item.desc}
-                                        </span>
-                                    </div>
-
-                                </button>
-                            ))}
-
-                            {/* ROW 2 */}
-                            {[
-                                {
-                                    id: 'fn.03',
-                                    title: 'FULL STACK ARCHITECTURE',
-                                    stack: ['Next.js', 'Database', 'Auth', 'API Routes'],
-                                    desc: '// The backbone/database',
-                                    size: 'md:col-span-3'
-                                },
-                                {
-                                    id: 'fn.04',
-                                    title: 'PERFORMANCE ENGINE',
-                                    stack: ['SEO', 'Analytics', 'Edge'],
-                                    desc: '// Optimization & Growth',
-                                    size: 'md:col-span-2'
-                                }
-                            ].map((item) => (
-                                <button
-                                    key={item.id}
-                                    className={`${item.size} group relative flex flex-col justify-between p-6 md:p-8 bg-white/5 border border-white/10 hover:border-emerald-500/50 hover:bg-white/10 transition-all duration-300 rounded-lg text-left cursor-none`}
-                                    type="button"
-                                >
-
-                                    <div className="flex justify-between items-start w-full mb-8">
-                                        <span className="font-mono text-emerald-500 text-sm font-bold">{item.id}</span>
-                                        <span className="opacity-0 group-hover:opacity-100 text-emerald-400 text-xl transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
-                                            🡥
-                                        </span>
-                                    </div>
-
-                                    <h3 className="text-2xl md:text-3xl font-bold text-white uppercase leading-none mb-4 group-hover:text-emerald-300 transition-colors">
-                                        {item.title}
-                                    </h3>
-
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex flex-wrap gap-2">
-                                            {item.stack.map((tech, i) => (
-                                                <span key={i} className="px-2 py-1 text-xs font-mono text-white font-semibold bg-white/10 rounded border border-white/10 group-hover:border-emerald-500/30 group-hover:text-emerald-100 transition-colors">
-                                                    {tech}
-                                                </span>
-                                            ))}
-                                        </div>
-                                        <span className="font-mono text-sm text-emerald-400 font-medium mt-1">
-                                            {item.desc}
-                                        </span>
-                                    </div>
-
-                                </button>
-                            ))}
-
-                        </div>
-
-                    </div>
-
+                {/* 5. EXPERIENCE: The path I’ve taken */}
+                {/* 5. EXPERIENCE: The path I’ve taken */}
+                <section className="min-h-screen mb-32 flex items-center justify-start px-8 md:pl-[5vw] md:pr-[5vw] relative z-10 pointer-events-none">
+                    <Skills />
                 </section>
+
+                {/* 6. TESTIMONIALS: Feedback that inspires */}
+                {/* <section className="min-h-[50vh] flex items-center justify-center relative z-10 pointer-events-none">
+                    <Testimonials />
+                </section> */}
 
             </main>
         </>

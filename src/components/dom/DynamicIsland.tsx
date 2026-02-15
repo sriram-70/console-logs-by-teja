@@ -8,6 +8,7 @@ export function DynamicIsland() {
     const [hoveredLink, setHoveredLink] = useState<string | null>(null)
     const [isVisible, setIsVisible] = useState(false)
     const [hasEntered, setHasEntered] = useState(false)
+    const [hasPlayedIntro, setHasPlayedIntro] = useState(false)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -27,12 +28,22 @@ export function DynamicIsland() {
 
     useEffect(() => {
         if (isVisible) {
+            // If intro already played, we set hasEntered immediately to true for instant interaction?
+            // Actually, for the simplified animation (drop -> expand), we still need a small delay before interaction is ready?
+            // The prompt says "simple animation ... pops down and expands".
+            // Let's stick to the timer logic:
+            // If it's the first time (!hasPlayedIntro), wait 1.8s.
+            // If it's subsequent times (hasPlayedIntro), the animation is faster (0.5s drop + expand).
+
+            const duration = hasPlayedIntro ? 600 : 1800;
+
             const timer = setTimeout(() => {
                 setHasEntered(true)
-            }, 1800) // Slightly longer than total animation time
+                if (!hasPlayedIntro) setHasPlayedIntro(true)
+            }, duration)
             return () => clearTimeout(timer)
         }
-    }, [isVisible])
+    }, [isVisible, hasPlayedIntro])
 
     const links = [
         { name: 'Services', href: '#services' },
@@ -47,23 +58,19 @@ export function DynamicIsland() {
             <motion.nav
                 initial={{ y: -100, width: 20, height: 20, borderRadius: 50, opacity: 0 }}
                 animate={{
-                    y: isVisible ? [
-                        -100, // Start
-                        0,    // Drop
-                        -40,  // Bounce 1 Up
-                        0     // Land
-                    ] : -100,
-                    x: isVisible ? [
+                    y: isVisible ? (
+                        !hasPlayedIntro ? [
+                            -100, // Start
+                            0,    // Drop
+                            -40,  // Bounce 1 Up
+                            0     // Land
+                        ] : 0 // Simple Drop
+                    ) : -100,
+                    x: isVisible && !hasPlayedIntro ? [
                         0,    // Start
                         0,    // Wait for bounce
                         -130, // Roll Left
-                        0     // Expand Correction (Left Anchor effect)
-                    ] : 0,
-                    rotate: isVisible ? [
-                        0,
-                        0,
-                        -360, // Roll Spin
-                        -360  // Stay Spun
+                        0     // Expand Correction
                     ] : 0,
                     width: isVisible ? (isExpanded ? 600 : 280) : 20,
                     height: isVisible ? 55 : 20,
@@ -72,23 +79,20 @@ export function DynamicIsland() {
                 }}
                 transition={{
                     y: {
-                        times: [0, 0.4, 0.7, 1], // 0.8s total duration for Y
-                        duration: 0.8,
-                        ease: "easeOut"
+                        times: !hasPlayedIntro ? [0, 0.4, 0.7, 1] : undefined,
+                        duration: !hasPlayedIntro ? 0.8 : 0.5,
+                        type: !hasPlayedIntro ? "keyframes" : "spring",
+                        stiffness: 100,
+                        damping: 20
                     },
                     x: {
-                        times: [0, 0.47, 0.76, 1], // 0.47=0.8s, 0.76=1.3s, 1=1.7s
-                        duration: 1.7,
-                        ease: "easeInOut"
-                    },
-                    rotate: {
                         times: [0, 0.47, 0.76, 1],
                         duration: 1.7,
                         ease: "easeInOut"
                     },
-                    width: { delay: isVisible && !hasEntered ? 1.3 : 0, type: "spring", stiffness: 100, damping: 20 }, // Wait for roll (1.3s)
-                    height: { delay: isVisible && !hasEntered ? 1.3 : 0, type: "spring", stiffness: 100, damping: 20 },
-                    borderRadius: { delay: isVisible && !hasEntered ? 1.3 : 0, duration: 0.3 },
+                    width: { delay: isVisible && !hasEntered ? (!hasPlayedIntro ? 1.3 : 0.5) : 0, type: "spring", stiffness: 100, damping: 20 },
+                    height: { delay: isVisible && !hasEntered ? (!hasPlayedIntro ? 1.3 : 0.5) : 0, type: "spring", stiffness: 100, damping: 20 },
+                    borderRadius: { delay: isVisible && !hasEntered ? (!hasPlayedIntro ? 1.3 : 0.5) : 0, duration: 0.3 },
                     opacity: { duration: 0.2 }
                 }}
                 onMouseEnter={() => setIsExpanded(true)}
@@ -107,7 +111,7 @@ export function DynamicIsland() {
                     className="flex w-full items-center justify-between"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: isVisible ? 1 : 0 }}
-                    transition={{ delay: isVisible ? 1.5 : 0, duration: 0.3 }} // Wait for expansion
+                    transition={{ delay: isVisible ? (hasPlayedIntro ? 0.7 : 1.5) : 0, duration: 0.3 }} // Fast reveal if intro done
                 >
                     {/* LOGO AREA */}
                     <div className="flex items-center shrink-0">

@@ -1,43 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Skills } from '@/components/sections/Skills'
 
 
 export function Overlay() {
-    const [loaded, setLoaded] = useState(false)
     const [isHovered, setIsHovered] = useState(false)
     const [activeProject, setActiveProject] = useState<string | null>(null)
 
-    useEffect(() => {
-        // Cinematic Intro Time
-        const timer = setTimeout(() => {
-            setLoaded(true)
-        }, 2000)
-        return () => clearTimeout(timer)
-    }, [])
-
     return (
         <>
-            {/* 0. CINEMATIC PRE-LOADER */}
-            <div
-                className={`fixed inset-0 bg-black z-50 flex items-center justify-center transition-opacity duration-2000 ease-in-out pointer-events-none ${loaded ? 'opacity-0' : 'opacity-100'}`}
-            >
-                <div className="relative flex flex-col items-center">
-                    {/* The Beam of Light / Sunrise */}
-                    <div className={`w-1 bg-white shadow-[0_0_100px_40px_rgba(255,255,255,0.8)] rounded-full transition-all duration-1500 ease-out ${loaded ? 'h-0 opacity-0' : 'h-64 opacity-100 animate-pulse'}`} />
-
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden w-64 h-8 flex justify-center items-center">
-                        <div className="text-[10px] font-mono text-white/40 tracking-[1em] uppercase animate-[ping_3s_ease-in-out_infinite]">
-                            Initializing
-                        </div>
-                    </div>
-
-                    {/* Horizontal horizon line expansion */}
-                    <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-px bg-white/50 shadow-[0_0_50px_10px_white] transition-all duration-1500 ease-out delay-500 ${loaded ? 'w-0 opacity-0' : 'w-96 opacity-100'}`} />
-                </div>
-            </div>
-
             <main className="w-full text-white font-sans selection:bg-cyan-300 selection:text-black">
 
                 {/* 1. HERO (Center) */}

@@ -1,0 +1,44 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Sunset View Gradient: From dark horizon/sky to bright sun -->
+    <linearGradient id="sunset_gradient" x1="256" y1="0" x2="256" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2c0e37"/> <!-- Deep Night Purple -->
+      <stop offset="0.35" stop-color="#851018"/> <!-- Crimson -->
+      <stop offset="0.7" stop-color="#fd5d2f"/> <!-- Sunset Orange -->
+      <stop offset="1" stop-color="#fdb32f"/> <!-- Horizon Gold -->
+    </linearGradient>
+
+    <!-- Complex Filter: Distortion + Softness + Noise (CLIPPED to Shape) -->
+    <filter id="textured_surface" x="-20%" y="-20%" width="140%" height="140%">
+      <!-- 1. Shape Distortion -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="2" result="warp_noise" seed="5"/>
+      <feDisplacementMap in="SourceGraphic" in2="warp_noise" scale="15" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+      <feGaussianBlur in="displaced" stdDeviation="3" result="softened"/>
+
+      <!-- 2. Grain/Noise Generation -->
+      <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="4" result="grain"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.3 0" in="grain" result="faint_grain"/>
+      
+      <!-- 3. Blend noise -->
+      <feBlend mode="overlay" in="faint_grain" in2="softened" result="noisy_shape_unclipped"/>
+      
+      <!-- 4. CRITICAL: Clip the noise to the original shape -->
+      <feComposite operator="in" in="noisy_shape_unclipped" in2="softened" result="final_shape"/>
+    </filter>
+    
+    <!-- Sharp Glitch Cutout Mask -->
+    <mask id="tech_cutout">
+      <rect width="512" height="512" fill="white"/>
+      <rect x="0" y="240" width="512" height="12" fill="black"/> 
+      <rect x="0" y="270" width="300" height="4" fill="black"/>
+      <rect x="350" y="270" width="162" height="4" fill="black"/>
+      <rect x="420" y="220" width="40" height="4" fill="black"/>
+      <rect x="450" y="255" width="20" height="20" fill="black"/>
+      <rect x="50" y="300" width="60" height="2" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- Main Celestial Body Only (No Outer Glow) -->
+  <circle cx="256" cy="256" r="155" fill="url(#sunset_gradient)" mask="url(#tech_cutout)" filter="url(#textured_surface)"/>
+  
+</svg>

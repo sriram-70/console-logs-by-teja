@@ -35,10 +35,10 @@ export default function Home() {
   const initiateLaunch = () => {
     if (footerState !== 'CRITICAL') {
       setFooterState('CRITICAL');
-      // The 0.5-Second Delay before the Flash
+      // The 0.7-Second Delay before the Flash
       setTimeout(() => {
         setFooterState('FLASH');
-      }, 500);
+      }, 700);
     }
   };
 

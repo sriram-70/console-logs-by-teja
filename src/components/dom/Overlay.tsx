@@ -41,12 +41,12 @@ export function Overlay() {
             <main className="w-full text-white font-sans selection:bg-cyan-300 selection:text-black">
 
                 {/* 1. HERO (Center) */}
-                <section className="h-screen w-full flex flex-col items-center justify-center p-8 relative">
+                <section className="h-screen w-full flex flex-col items-center justify-center p-8 relative cursor-none">
                     <div className="absolute top-8 left-8 text-xs font-mono opacity-50 tracking-widest">
                         v.2026.1 // SYSTEM_READY
                     </div>
                     {/* HERO TITLE GRID LOCK-UP */}
-                    <div className="flex flex-col items-start w-max z-10 mix-blend-exclusion select-none cursor-default">
+                    <div className="flex flex-col items-start w-max z-10 mix-blend-exclusion select-none cursor-none">
 
                         {/* ROW 1: THE ROOF (Defines block width) */}
                         <h1 className="text-[15vw] font-black leading-[0.75] tracking-tighter text-white uppercase">
@@ -68,7 +68,7 @@ export function Overlay() {
 
                                 {/* THE TRIGGER */}
                                 <div
-                                    className="relative cursor-pointer group"
+                                    className="relative cursor-none group"
                                     onMouseEnter={() => setIsHovered(true)}
                                     onMouseLeave={() => setIsHovered(false)}
                                 >

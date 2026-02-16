@@ -289,13 +289,6 @@ export function Overlay() {
                                     category: 'SaaS Marketing Site',
                                     url: 'https://www.tourneyplus.xyz/',
                                     img: '/tourneyplus.xyz.png'
-                                },
-                                {
-                                    id: '03',
-                                    name: 'GK FINANCE',
-                                    category: 'Fintech Landing Page',
-                                    url: 'https://gkfinance.cloud/',
-                                    img: '/gkfinance.cloud.png'
                                 }
                             ].map((project) => (
                                 <a

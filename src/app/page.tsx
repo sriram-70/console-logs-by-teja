@@ -6,6 +6,10 @@ import { Overlay } from '@/components/dom/Overlay'
 import { Atmosphere } from '@/components/dom/Atmosphere'
 import { Instagram, Github, Mail } from 'lucide-react'
 import { useUI } from '@/context/UIContext'
+import { useScrollStore } from '@/store/useScrollStore'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ProcessBackgroundLayer } from '@/components/sections/Process'
 
 export default function Home() {
   const [footerState, setFooterState] = useState('IDLE')
@@ -16,6 +20,7 @@ export default function Home() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     type: '',
     budget: '',
     timeline: '',
@@ -42,6 +47,35 @@ export default function Home() {
     }
   };
 
+  const isProcessActive = useScrollStore((state) => state.isProcessActive) // Bind isProcessActive state
+
+  // Use Locomotive Scroll for smooth scrolling
+  useEffect(() => {
+    let locomotiveScroll: any
+    (async () => {
+      const LocomotiveScroll = (await import('locomotive-scroll')).default
+      locomotiveScroll = new LocomotiveScroll()
+    })()
+
+    return () => {
+      if (locomotiveScroll) locomotiveScroll.destroy()
+    }
+  }, [])
+
+  // Setup GSAP matchMedia for responsive animations outside R3F
+  useEffect(() => {
+    let ctx = gsap.context(() => {
+      // Setup hero exit animation - trigger when user scrolls down
+      // Uses matchMedia to behave differently on mobile vs desktop
+      ScrollTrigger.matchMedia({
+        "(min-width: 768px)": function () {
+          // Desktop hero text animation
+        }
+      })
+    })
+
+    return () => ctx.revert()
+  }, [])
 
 
   return (
@@ -50,14 +84,19 @@ export default function Home() {
       {/* FORM BACKGROUND (Behind Scene) */}
       <div className={`fixed inset-0 bg-white z-[-1] transition-opacity duration-1000 ${['FLASH', 'FORM'].includes(footerState) ? 'opacity-100' : 'opacity-0'}`} />
 
-      <div className="fixed inset-0 z-0">
+      {/* NEW: Process Background Layer (Line & Dots). Has its own z-10 class natively. */}
+      <ProcessBackgroundLayer />
+
+      {/* R3F Canvas - Fixed explicitly at z-20 to sandwich between line and text. */}
+      <div className="fixed inset-0 pointer-events-none z-20">
         <Scene footerState={footerState} />
       </div>
 
-      <div className="relative z-10">
+      <div className="relative z-30">
         {/* Hide Overlay Content during Form */}
-        <div className={`transition-opacity duration-500 ${footerState === 'FORM' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-          <Overlay />
+        <div
+          className={`transition-opacity duration-500 ${footerState === 'FORM' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        >  <Overlay />
         </div>
 
         <footer id="contact" className="min-h-screen relative flex flex-col justify-end items-center pb-0 z-10 overflow-hidden">
@@ -90,7 +129,18 @@ export default function Home() {
           </div>
 
           {/* 2. THE TRIGGER (Visible in IDLE/CHARGING/CRITICAL) */}
-          <div className={`mb-[15vh] z-20 transition-all duration-500 ${['IDLE', 'CHARGING', 'CRITICAL'].includes(footerState) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div className={`mb-[15vh] z-20 transition-all duration-500 flex flex-col items-center gap-8 ${['IDLE', 'CHARGING', 'CRITICAL'].includes(footerState) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+
+            {/* New Lines */}
+            <div className="text-center space-y-3">
+              <p className="text-2xl md:text-3xl text-white font-medium tracking-wide">
+                If It Matters, Let’s Build It Right.
+              </p>
+              <p className="text-lg md:text-xl text-white/50 font-mono">
+                Built for businesses that care about clarity and results.
+              </p>
+            </div>
+
             <button
               className="group relative cursor-none"
               onMouseEnter={handleHoverStart}
@@ -138,7 +188,7 @@ export default function Home() {
                     window.scrollTo(0, 0);
                     setFooterState('IDLE');
                     setFormStep(1); // Reset form step
-                    setFormData({ name: '', email: '', type: '', budget: '', timeline: '', details: '' }); // Reset form data
+                    setFormData({ name: '', email: '', phone: '', type: '', budget: '', timeline: '', details: '' }); // Reset form data
                   }, 2500);
                 }
               }}>
@@ -174,6 +224,14 @@ export default function Home() {
                     required={formStep === 1}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-transparent border-b-2 border-black/10 py-4 text-2xl text-black font-bold outline-none focus:border-black transition-colors placeholder:text-black/20"
+                  />
+                  <input
+                    suppressHydrationWarning
+                    type="tel"
+                    placeholder="PHONE NUMBER (OPTIONAL)"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full bg-transparent border-b-2 border-black/10 py-4 text-2xl text-black font-bold outline-none focus:border-black transition-colors placeholder:text-black/20"
                   />
 
@@ -216,24 +274,7 @@ export default function Home() {
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-black/40">▼</div>
                   </div>
 
-                  {/* Budget Range */}
-                  <div className="relative">
-                    <select
-                      suppressHydrationWarning
-                      required={formStep === 2}
-                      value={formData.budget}
-                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                      className="w-full bg-transparent border-b-2 border-black/10 py-4 text-2xl text-black font-bold outline-none focus:border-black transition-colors appearance-none"
-                    >
-                      <option value="" disabled>BUDGET RANGE</option>
-                      <option value="500">$500 - $1,000</option>
-                      <option value="1k">$1,000 - $2,500</option>
-                      <option value="2.5k">$2,500 - $5,000</option>
-                      <option value="5k">$5,000+</option>
-                      <option value="discuss">Let's Discuss</option>
-                    </select>
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-black/40">▼</div>
-                  </div>
+
 
                   {/* Timeline */}
                   <div className="relative">

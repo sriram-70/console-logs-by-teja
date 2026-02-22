@@ -15,7 +15,7 @@ export function Scene({ footerState }: { footerState?: string }) {
                 shadows
                 gl={{ antialias: true, alpha: true }}
                 camera={{ position: [0, 0, 5], fov: 35 }}
-                dpr={[1, 1.5]} // Optimize for performance
+                dpr={[1, 2]} // Optimize for performance while supporting high-res
             >
                 <Suspense fallback={null}>
                     <Sun footerState={footerState} />

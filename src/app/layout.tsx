@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Great_Vibes } from 'next/font/google'
 import './globals.css'
 import { ClientLayout } from '@/components/dom/ClientLayout'
 import { DynamicIsland } from '@/components/dom/DynamicIsland'
 
 const inter = Inter({ subsets: ['latin'] })
+const signatureFont = Great_Vibes({ weight: '400', subsets: ['latin'], variable: '--font-signature' })
 
 export const metadata: Metadata = {
   title: 'CONSOLE LOGS BY TEJA',
@@ -20,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${signatureFont.variable}`}>
         <UIProvider>
           <ClientLayout>
             <DynamicIsland />

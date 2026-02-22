@@ -1,123 +1,98 @@
 'use client'
 
-import React, { useRef, useMemo } from 'react'
+import { useRef } from 'react'
 import { useFrame, extend } from '@react-three/fiber'
-import { shaderMaterial, useScroll } from '@react-three/drei'
+import { shaderMaterial } from '@react-three/drei'
 import * as THREE from 'three'
-import { easing } from 'maath'
+import { useScrollStore } from '@/store/useScrollStore'
 
-// --- Custom Shader Material ---
 const SunMaterial = shaderMaterial(
   {
     uTime: 0,
     uScroll: 0,
-    uState: 0, // 0: IDLE, 1: CHARGING, 2: CRITICAL
-    uIsWizard: 0, // 0: False, 1: True
+    uState: 0,
+    uIsWizard: 0,
+    uIsThinking: 0,
   },
-  // Vertex Shader
   `
-    varying vec2 vUv;
     varying vec3 vNormal;
     varying vec3 vPosition;
     varying float vNoise;
     uniform float uTime;
     uniform float uScroll;
-    uniform float uState; // Used for vertex chaos if needed
-    uniform float uIsWizard;
+    uniform float uState;
 
-    // Simplex Noise (Keeping original function or optimized one)
     vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
     vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
     vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
     vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
     float snoise(vec3 v) {
-      const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
-      const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
-      vec3 i  = floor(v + dot(v, C.yyy) );
-      vec3 x0 = v - i + dot(i, C.xxx) ;
+      const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+      const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+      vec3 i = floor(v + dot(v, C.yyy));
+      vec3 x0 = v - i + dot(i, C.xxx);
       vec3 g = step(x0.yzx, x0.xyz);
       vec3 l = 1.0 - g;
-      vec3 i1 = min( g.xyz, l.zxy );
-      vec3 i2 = max( g.xyz, l.zxy );
+      vec3 i1 = min(g.xyz, l.zxy);
+      vec3 i2 = max(g.xyz, l.zxy);
       vec3 x1 = x0 - i1 + C.xxx;
       vec3 x2 = x0 - i2 + C.yyy;
       vec3 x3 = x0 - D.yyy;
       i = mod289(i);
-      vec4 p = permute( permute( permute(
-                i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-              + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
-              + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+      vec4 p = permute(permute(permute(
+        i.z + vec4(0.0, i1.z, i2.z, 1.0))
+        + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+        + i.x + vec4(0.0, i1.x, i2.x, 1.0));
       float n_ = 0.142857142857;
-      vec3  ns = n_ * D.wyz - D.xzx;
+      vec3 ns = n_ * D.wyz - D.xzx;
       vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
       vec4 x_ = floor(j * ns.z);
-      vec4 y_ = floor(j - 7.0 * x_ );
-      vec4 x = x_ *ns.x + ns.yyyy;
-      vec4 y = y_ *ns.x + ns.yyyy;
+      vec4 y_ = floor(j - 7.0 * x_);
+      vec4 x = x_ * ns.x + ns.yyyy;
+      vec4 y = y_ * ns.x + ns.yyyy;
       vec4 h = 1.0 - abs(x) - abs(y);
-      vec4 b0 = vec4( x.xy, y.xy );
-      vec4 b1 = vec4( x.zw, y.zw );
-      vec4 s0 = floor(b0)*2.0 + 1.0;
-      vec4 s1 = floor(b1)*2.0 + 1.0;
+      vec4 b0 = vec4(x.xy, y.xy);
+      vec4 b1 = vec4(x.zw, y.zw);
+      vec4 s0 = floor(b0) * 2.0 + 1.0;
+      vec4 s1 = floor(b1) * 2.0 + 1.0;
       vec4 sh = -step(h, vec4(0.0));
-      vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-      vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-      vec3 p0 = vec3(a0.xy,h.x);
-      vec3 p1 = vec3(a0.zw,h.y);
-      vec3 p2 = vec3(a1.xy,h.z);
-      vec3 p3 = vec3(a1.zw,h.w);
-      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+      vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+      vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+      vec3 p0 = vec3(a0.xy, h.x);
+      vec3 p1 = vec3(a0.zw, h.y);
+      vec3 p2 = vec3(a1.xy, h.z);
+      vec3 p3 = vec3(a1.zw, h.w);
+      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
       p0 *= norm.x;
       p1 *= norm.y;
       p2 *= norm.z;
       p3 *= norm.w;
       vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
       m = m * m;
-      return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
-                                    dot(p2,x2), dot(p3,x3) ) );
+      return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
     }
 
     void main() {
-      vUv = uv;
       vNormal = normalize(normalMatrix * normal);
-      
-      // -- MORPH LOGIC --
-      // Scroll 0.0: Spiky (High freq, High amp)
-      // Scroll 0.5: Smooth (Low freq, Low amp)
-      // Scroll 1.0: Boiling (Med freq, Med amp)
-      
-      float noiseFreq = mix(2.5, 1.0, uScroll); // 2.5 -> 1.0
-      float noiseAmp  = mix(0.4, 0.1, uScroll);  // 0.4 -> 0.1
-      
-      // CRITICAL STATE OVERRIDES
-      if (uState > 1.5) { // CRITICAL
-         noiseFreq = 3.0; // High chaos
-         noiseAmp = 0.3; // Distorted
-      }
-      
-      // Make it boil faster at higher scroll?
-      float timeSpeed = 0.5 + uScroll * 0.5;
-      
-      float noise = snoise(position * noiseFreq + uTime * timeSpeed);
-      vNoise = noise; // Pass to frag
-      
-      // Displacement
+      float noiseFreq = mix(2.5, 1.0, uScroll);
+      float noiseAmp = mix(0.4, 0.1, uScroll);
+      if (uState > 1.5) { noiseFreq = 3.0; noiseAmp = 0.3; }
+      float noise = snoise(position * noiseFreq + uTime * (0.5 + uScroll * 0.5));
+      vNoise = noise;
       vec3 pos = position + normal * noise * noiseAmp;
-      
       vPosition = pos;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
     }
   `,
-  // Fragment Shader
   `
-    varying vec2 vUv;
     varying vec3 vNormal;
     varying vec3 vPosition;
     varying float vNoise;
     uniform float uTime;
     uniform float uScroll;
-    uniform float uState; // 0: IDLE, 1: CHARGING, 2: CRITICAL
+    uniform float uState;
     uniform float uIsWizard;
+    uniform float uIsThinking;
 
     void main() {
       vec3 viewDir = normalize(cameraPosition - vPosition);
@@ -125,95 +100,77 @@ const SunMaterial = shaderMaterial(
       fresnel = clamp(1.0 - fresnel, 0.0, 1.0);
       fresnel = pow(fresnel, 3.0);
 
-      // --- COLOR PALETTE EVOLUTION ---
-      // 0.0: White/Holo Explosion
-      vec3 colStart = vec3(1.2, 1.1, 1.4); // Bright white-blue
-      vec3 colStartCore = vec3(0.1, 0.4, 0.8); // Deep blue core
+      vec3 colStart = vec3(1.2, 1.1, 1.4);
+      vec3 colStartCore = vec3(0.1, 0.4, 0.8);
+      vec3 colViolet = vec3(0.7, 0.4, 1.0);
+      vec3 colVioletCore = vec3(0.2, 0.1, 0.4);
+      vec3 colMid = vec3(0.0, 1.0, 0.8);
+      vec3 colMidCore = vec3(0.0, 0.2, 0.2);
+      vec3 colAmber = vec3(1.0, 0.7, 0.2);
+      vec3 colAmberCore = vec3(0.4, 0.15, 0.0);
+      vec3 colEnd = vec3(1.4, 0.35, 0.08);
+      vec3 colEndCore = vec3(0.7, 0.08, 0.0);
 
-      // 0.5: Cyan/Structure
-      vec3 colMid = vec3(0.0, 1.0, 0.8); // Cyan
-      vec3 colMidCore = vec3(0.0, 0.2, 0.2); // Dark teal
-
-      // 1.0: Magma Red
-      vec3 colEnd = vec3(1.0, 0.3, 0.1); // Orange
-      vec3 colEndCore = vec3(0.5, 0.0, 0.0); // Dark Red
-      
-      // Mix based on scroll
       vec3 finalCore;
       vec3 finalRim;
-      
-      if (uScroll < 0.5) {
-        float t = uScroll * 2.0;
-        finalCore = mix(colStartCore, colMidCore, t);
-        finalRim  = mix(colStart, colMid, t);
+      if (uScroll < 0.25) {
+        float t = uScroll * 4.0;
+        finalCore = mix(colStartCore, colVioletCore, t);
+        finalRim = mix(colStart, colViolet, t);
+      } else if (uScroll < 0.50) {
+        float t = (uScroll - 0.25) * 4.0;
+        finalCore = mix(colVioletCore, colMidCore, t);
+        finalRim = mix(colViolet, colMid, t);
+      } else if (uScroll < 0.75) {
+        float t = (uScroll - 0.50) * 4.0;
+        finalCore = mix(colMidCore, colAmberCore, t);
+        finalRim = mix(colMid, colAmber, t);
       } else {
-        float t = (uScroll - 0.5) * 2.0;
-        finalCore = mix(colMidCore, colEndCore, t);
-        finalRim  = mix(colMid, colEnd, t);
+        float t = (uScroll - 0.75) * 4.0;
+        finalCore = mix(colAmberCore, colEndCore, t);
+        finalRim = mix(colAmber, colEnd, t);
       }
-      
-      // STANDARD COLOR
+
       vec3 color = mix(finalCore, finalRim, fresnel + vNoise * 0.2);
 
-      // --- WIZARD OVERRIDE (Rich / Vampire / Vantablack) ---
-      if (uIsWizard > 0.5) {
-         // Vantablack Core (Absorbs light)
-         vec3 vantaBlack = vec3(0.001, 0.001, 0.001); 
-         
-         // Vampire Black (Deep Reddish/warm Black) - #080402 approx
-         vec3 vampireBlack = vec3(0.03, 0.015, 0.01);
-         
-         // Rich Black (Cooler, slightly blueish) - #010203 approx
-         vec3 richBlack = vec3(0.01, 0.02, 0.03);
-         
-         // Mix pattern:
-         // Core is Vantablack (Deepest void)
-         // Mids are Vampire Black (Subtle warmth in noise)
-         // Rim is Rich Black (Reflecting environment)
-         
-         // 1. Base mix on Noise (Texture)
-         vec3 baseMix = mix(vantaBlack, vampireBlack, vNoise * 0.5 + 0.5);
-         
-         // 2. Add Fresnel Rim (Rich Black gloss)
-         // Sharper fresnel for glossy "Alien" look, or softer for matte? 
-         // "Vantablack" implies matte, but "Object" usually needs definition.
-         // Let's go with a subtle, glossy Rich Black rim.
-         
-         float rim = pow(fresnel, 4.0); // Tighter rim
-         color = mix(baseMix, richBlack, rim * 0.8);
-         
-         // 3. Add deep specular highlights?
-         // Maybe a tiny bit of white specular for wet look
-         // color += vec3(0.1) * pow(fresnel, 8.0);
+      if (uScroll > 0.75) {
+        float glowT = (uScroll - 0.75) / 0.25;
+        vec3 fireGlow = vec3(1.2, 0.4, 0.1);
+        color += fireGlow * glowT * 0.5 * (0.5 + fresnel);
       }
-      
-      // --- STATE OVERRIDES ---
-      vec3 sunsetCore = vec3(0.5, 0.0, 0.0); // Deep Red Core
-      vec3 goldenRim = vec3(1.0, 0.6, 0.0); // Golden Orange Rim
-      
-      float emissiveIntensity = 0.0;
-      
-      if (uState > 0.5 && uState < 1.5) {
-         // CHARGING: Pulse Golden Orange
-         // Mix towards bright golden orange
-         color = mix(color, goldenRim, 0.5 + sin(uTime * 10.0) * 0.2);
-         emissiveIntensity = 0.5; 
-      } else if (uState > 1.5) {
-         // CRITICAL: Sunset Red / Magma Explosion
-         // Deep red core, Golden rim
-         color = mix(sunsetCore, goldenRim, fresnel * 2.0); 
-         // Add bright yellow/white lightning/embedded heat
-         color += vec3(1.0, 0.8, 0.2) * (vNoise * 3.0); 
-         emissiveIntensity = 2.0; 
-      }
-      
-      // Add "heat" glow (base fresnel) adjusted by usage
-      // Prompt says IDLE Emissive = 0. So we keep base color only.
-      // We add the emissive glow on top
-      
-      // Use GoldenRim for emissive coloring in active states
-      color += goldenRim * emissiveIntensity * fresnel;
 
+      if (uIsWizard > 0.5) {
+        vec3 vantaBlack = vec3(0.001, 0.001, 0.001);
+        vec3 vampireBlack = vec3(0.03, 0.015, 0.01);
+        vec3 richBlack = vec3(0.01, 0.02, 0.03);
+        vec3 baseMix = mix(vantaBlack, vampireBlack, vNoise * 0.5 + 0.5);
+        float rim = pow(fresnel, 4.0);
+        color = mix(baseMix, richBlack, rim * 0.8);
+      }
+
+      if (uIsThinking > 0.5) {
+        // Solid Volumetric Blue/Purple core with Cyan stroke rim
+        vec3 blueprintCore = vec3(0.0, 0.28, 0.67); // Royal Blue #0047AB 
+        vec3 cyanRim = vec3(0.0, 0.95, 1.0);        // High-intensity Cyan #00F2FF
+        
+        // Clean, clamped rim lighting mixed with gentle noise to avoid tearing
+        float bpRim = pow(fresnel, 1.5);
+        float mixFactor = clamp(bpRim + (vNoise * 0.2), 0.0, 1.0);
+        color = mix(blueprintCore, cyanRim, mixFactor);
+      }
+
+      vec3 sunsetCore = vec3(0.5, 0.0, 0.0);
+      vec3 goldenRim = vec3(1.0, 0.6, 0.0);
+      float emissiveIntensity = 0.0;
+      if (uState > 0.5 && uState < 1.5) {
+        color = mix(color, goldenRim, 0.5 + sin(uTime * 10.0) * 0.2);
+        emissiveIntensity = 0.5;
+      } else if (uState > 1.5) {
+        color = mix(sunsetCore, goldenRim, fresnel * 2.0);
+        color += vec3(1.0, 0.8, 0.2) * (vNoise * 3.0);
+        emissiveIntensity = 2.0;
+      }
+      color += goldenRim * emissiveIntensity * fresnel;
       gl_FragColor = vec4(color, 1.0);
     }
   `
@@ -221,7 +178,6 @@ const SunMaterial = shaderMaterial(
 
 extend({ SunMaterial })
 
-// TypeScript declaration for the custom element
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -234,125 +190,165 @@ export function Sun({ footerState }: { footerState?: string }) {
   const meshRef = useRef<THREE.Mesh>(null)
   const materialRef = useRef<any>(null)
 
-  // Track rotation manually to prevent jumps when speed changes
   const rotationY = useRef(0)
   const rotationX = useRef(0)
+  const lastProcessProgress = useRef(0)
+  const smoothedSpeedRef = useRef(0)
+  const diagnosticBlendRef = useRef(0)
+  const worksSectionBlendRef = useRef(0)
+  const thinkingBlendRef = useRef(0)
 
   useFrame((state, delta) => {
     if (!materialRef.current || !meshRef.current) return
 
-    // Calculate Scroll Progress (0 to 1)
     const maxScroll = document.documentElement.scrollHeight - window.innerHeight
     const scrollTop = window.scrollY
     const rawProgress = maxScroll > 0 ? scrollTop / maxScroll : 0
-
-    // DIRECT: No damping for offset
     const offset = rawProgress
 
-    // Determine numeric state for shader
     let stateNum = 0
     if (footerState === 'CHARGING') stateNum = 1
     if (footerState === 'CRITICAL') stateNum = 2
-
-    // Pass to shader
     materialRef.current.uState = stateNum
 
-    // Time & Scroll Uniforms
-    // Slow internal boiling
-    // Speed up boiling if charging or critical
+    const { processProgress, isDiagnosticActive } = useScrollStore.getState()
+    const progressDelta = processProgress - lastProcessProgress.current
+    lastProcessProgress.current = processProgress
+    const currentScrollSpeed = delta > 0 ? Math.abs(progressDelta) / delta : 0
+    smoothedSpeedRef.current = THREE.MathUtils.lerp(smoothedSpeedRef.current, currentScrollSpeed, 0.1)
+
+    diagnosticBlendRef.current = THREE.MathUtils.lerp(diagnosticBlendRef.current, isDiagnosticActive ? 1 : 0, 0.08)
+    const diagnosticBlend = diagnosticBlendRef.current
+
+    const { isThinkingActive } = useScrollStore.getState()
+    thinkingBlendRef.current = THREE.MathUtils.lerp(thinkingBlendRef.current, isThinkingActive ? 1 : 0, 0.08)
+    const thinkingBlend = thinkingBlendRef.current
+
+    materialRef.current.wireframe = false
+
+    let worksBlend = 0
+    const worksEl = document.getElementById('works')
+    if (worksEl) {
+      const rect = worksEl.getBoundingClientRect()
+      const vh = window.innerHeight
+      if (rect.top <= vh && rect.bottom >= 0) {
+        if (rect.top > 0) worksBlend = Math.max(0, (vh - rect.top) / vh)
+        else if (rect.bottom < vh) worksBlend = Math.max(0, rect.bottom / vh)
+        else worksBlend = 1
+      }
+    }
+    worksSectionBlendRef.current = THREE.MathUtils.lerp(worksSectionBlendRef.current, worksBlend, 0.1)
+    const worksSectionBlend = worksSectionBlendRef.current
+
     let boilSpeed = 0.1
-    if (footerState === 'CHARGING') boilSpeed = 0.5
-    if (footerState === 'CRITICAL') boilSpeed = 2.0
+    let spinSpeed = 0.2
+    if (footerState === 'CHARGING') { boilSpeed = 0.5; spinSpeed = 5.0; }
+    if (footerState === 'CRITICAL') { boilSpeed = 2.0; spinSpeed = 20.0; }
+    boilSpeed = THREE.MathUtils.lerp(boilSpeed, 0.045, diagnosticBlend)
+    spinSpeed = THREE.MathUtils.lerp(spinSpeed, 0.03, diagnosticBlend)
+    spinSpeed = THREE.MathUtils.lerp(spinSpeed, 0.05, worksSectionBlend)
 
-    materialRef.current.uTime = state.clock.elapsedTime * boilSpeed
-    materialRef.current.uScroll = offset
+    // Slow heavily exactly during thinking process blueprint mode
+    spinSpeed = THREE.MathUtils.lerp(spinSpeed, 0.015, thinkingBlend)
+    boilSpeed = THREE.MathUtils.lerp(boilSpeed, 0.08, thinkingBlend)
 
-    // --- 1. PLANETARY REVOLUTION (X-Axis Position) ---
-    // Sections Logic:
-    // 0.00 - 0.15: HERO (Center)
-    // 0.15 - 0.30: ABOUT (Right)
-    // 0.30 - 0.45: SERVICES / WHAT I BRING (Right)
-    // 0.45 - 0.60: WORKS (Left)
-    // 0.60 - 0.75: TECH STACK (Right)
-    // 0.75 - 1.00: FOOTER (Center Down)
-
-    let targetX = 0
-    let targetY = 0
-    let targetZ = 0
+    let defaultX = 0
+    let defaultY = 0
+    let defaultZ = 0
+    let defaultScale = 1
 
     if (offset < 0.15) {
-      // Hero: Center
-      targetX = 0
-      targetZ = 0
+      defaultX = 0; defaultZ = 0
     } else if (offset < 0.30) {
-      // About: Move Right (Slide 0.15 -> 0.20 - QUICKLY)
       const sectionP = (offset - 0.15) / 0.05
-      if (sectionP < 1.0) targetX = sectionP * 2.5
-      else targetX = 2.5
-      targetZ = -1
+      if (sectionP < 1.0) defaultX = sectionP * 2.5
+      else defaultX = 2.5
+      defaultZ = -1
     } else if (offset < 0.45) {
-      // Services: Stay Right
-      targetX = 2.5
-      targetZ = -1
+      defaultX = 2.5; defaultZ = -1
     } else if (offset < 0.60) {
-      // Works: Move Right -> Left
       const sectionP = (offset - 0.45) / 0.15
-      targetX = 2.5 - (sectionP * 5.0) // 2.5 -> -2.5
-      targetZ = -0.5
+      defaultX = 2.5 - (sectionP * 5.0); defaultZ = -0.5
     } else if (offset < 0.75) {
-      // Tech Stack: Move Left -> Right
       const sectionP = (offset - 0.60) / 0.15
-      targetX = -2.5 + (sectionP * 5.0) // -2.5 -> 2.5
-      targetZ = -1
+      defaultX = -2.5 + (sectionP * 5.0); defaultZ = -1
     } else {
-      // Footer: Move Right -> Center Down
-      const sectionP = (offset - 0.75) / 0.25
-      targetX = 2.5 - (sectionP * 2.5) // 2.5 -> 0
-      targetY = -1.5 * sectionP
-      targetZ = 1 * sectionP
+      const sectionP = Math.min(1.0, (offset - 0.75) / 0.25)
+      defaultX = 2.5 - (sectionP * 2.5)
+      defaultY = -1.5 * sectionP
+      defaultZ = 1 * sectionP
+      defaultScale = 1.0 + (sectionP * 0.5)
     }
 
-    // --- FORM STATE OVERRIDE ---
+    let pBlend = 0
+    const processEl = document.getElementById('process')
+    if (processEl) {
+      const rect = processEl.getBoundingClientRect()
+      const vh = window.innerHeight
+      if (rect.top <= vh && rect.bottom >= 0) {
+        if (rect.top > 0) pBlend = Math.max(0, (vh - rect.top) / vh)
+        else if (rect.bottom < vh) pBlend = Math.max(0, rect.bottom / vh)
+        else pBlend = 1
+      }
+    }
+
+    const smoothBlend = Math.sin((pBlend * Math.PI) / 2)
+    if (pBlend > 0.05) {
+      materialRef.current.uScroll = THREE.MathUtils.lerp(offset, 0.7, smoothBlend)
+    } else {
+      materialRef.current.uScroll = offset
+    }
+
+    let targetX = THREE.MathUtils.lerp(defaultX, 0, smoothBlend)
+    let targetY = THREE.MathUtils.lerp(defaultY, 0, smoothBlend)
+    let targetZ = THREE.MathUtils.lerp(defaultZ, 0, smoothBlend)
+    let targetScale = THREE.MathUtils.lerp(defaultScale, 0.4, smoothBlend)
+
+    targetX = THREE.MathUtils.lerp(targetX, 1.55, diagnosticBlend)
+    targetY = THREE.MathUtils.lerp(targetY, 0.05, diagnosticBlend)
+    targetZ = THREE.MathUtils.lerp(targetZ, -0.8, diagnosticBlend)
+    targetScale = THREE.MathUtils.lerp(targetScale, 0.72, diagnosticBlend)
+    materialRef.current.uScroll = THREE.MathUtils.lerp(materialRef.current.uScroll, 0.16, diagnosticBlend)
+
+    targetX = THREE.MathUtils.lerp(targetX, -1.8, worksSectionBlend)
+    targetY = THREE.MathUtils.lerp(targetY, 0, worksSectionBlend)
+    targetZ = THREE.MathUtils.lerp(targetZ, 0.1, worksSectionBlend)
+    targetScale = THREE.MathUtils.lerp(targetScale, 0.84, worksSectionBlend)
+
     if (footerState === 'FORM' || footerState === 'FLASH') {
-      // Force footer position and visual state
       targetX = 0
       targetY = -1.5
-      targetZ = 2.2 // Brought closer to camera (was 1) to appear bigger
-      // Force offset to 1.0 (Magma Red / Boiling)
-      // We can't re-assign const offset, so we used 'offset' variable in calculations above. 
-      // But 'offset' corresponds to uScroll uniform.
+      targetZ = 2.2
+      targetScale = 1
       materialRef.current.uScroll = 1.0
-
-      // ENABLE WIZARD COLOR
       materialRef.current.uIsWizard = 1.0
+      diagnosticBlendRef.current = 0
+      worksSectionBlendRef.current = 0
     } else {
       materialRef.current.uIsWizard = 0.0
     }
 
-    // Pass to shader (Standard)
-    if (footerState !== 'FORM' && footerState !== 'FLASH') {
-      materialRef.current.uScroll = offset
-    }
+    // Thinking Blueprint target logic
+    materialRef.current.uIsThinking = thinkingBlend
+
+    // Tunnel mode centers the blob completely instead of pushing it left
+    targetX = THREE.MathUtils.lerp(targetX, 0.0, thinkingBlend)
+    targetY = THREE.MathUtils.lerp(targetY, 0.0, thinkingBlend)
+    targetZ = THREE.MathUtils.lerp(targetZ, -2.5, thinkingBlend)
+    targetScale = THREE.MathUtils.lerp(targetScale, 0.0, thinkingBlend) // scale to 0 to remove
 
     const responsiveX = window.innerWidth < 768 ? 0 : targetX
-
-    // Apply position DIRECTLY (with tiny lerp for frame smoothness only)
     meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, responsiveX, 0.2)
     meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, targetY, 0.2)
     meshRef.current.position.z = THREE.MathUtils.lerp(meshRef.current.position.z, targetZ, 0.2)
+    meshRef.current.scale.set(targetScale, targetScale, targetScale)
 
-    // --- 2. THE ROTATION (Spin) ---
-    // If charging, spin violently (high speed accumulator)
-    // Normal: 0.2 rad/s approx
-    // Charging: 5.0 base speed.
-    // Critical: 20.0 base speed
-    let spinSpeed = 0.2
-    if (footerState === 'CHARGING') spinSpeed = 5.0
-    if (footerState === 'CRITICAL') spinSpeed = 20.0
+    const baseOpacity = THREE.MathUtils.clamp(1 - diagnosticBlend * 0.45 - worksSectionBlend * 0.1 - thinkingBlend * 1.0, 0.0, 1)
+    materialRef.current.opacity = THREE.MathUtils.lerp(materialRef.current.opacity ?? 1, baseOpacity, 0.12)
+    materialRef.current.uTime = state.clock.elapsedTime * (boilSpeed * (1 - diagnosticBlend * 0.25))
 
     rotationY.current += delta * spinSpeed
     rotationX.current += delta * (spinSpeed * 0.5)
-
     meshRef.current.rotation.y = rotationY.current
     meshRef.current.rotation.x = rotationX.current
   })
@@ -360,9 +356,8 @@ export function Sun({ footerState }: { footerState?: string }) {
   return (
     <mesh ref={meshRef} position={[0, 0, 0]}>
       <sphereGeometry args={[0.9, 128, 128]} />
-      {/* High poly for spikes */}
       {/* @ts-ignore */}
-      <sunMaterial ref={materialRef} transparent />
+      <sunMaterial ref={materialRef} transparent depthWrite={true} />
     </mesh>
   )
 }

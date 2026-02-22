@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useUI } from '@/context/UIContext'
 
 export function DynamicIsland() {
+    const { headerPosition } = useUI()
     const [isExpanded, setIsExpanded] = useState(false)
     const [hoveredLink, setHoveredLink] = useState<string | null>(null)
     const [isVisible, setIsVisible] = useState(false)
-    const [hasEntered, setHasEntered] = useState(false)
-    const [hasPlayedIntro, setHasPlayedIntro] = useState(false)
 
     useEffect(() => {
         const handleScroll = () => {
@@ -17,7 +17,6 @@ export function DynamicIsland() {
                 setIsVisible(true)
             } else {
                 setIsVisible(false)
-                setHasEntered(false)
             }
         }
 
@@ -26,73 +25,88 @@ export function DynamicIsland() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
+    const [windowWidth, setWindowWidth] = useState(1200)
+
     useEffect(() => {
-        if (isVisible) {
-            // If intro already played, we set hasEntered immediately to true for instant interaction?
-            // Actually, for the simplified animation (drop -> expand), we still need a small delay before interaction is ready?
-            // The prompt says "simple animation ... pops down and expands".
-            // Let's stick to the timer logic:
-            // If it's the first time (!hasPlayedIntro), wait 1.8s.
-            // If it's subsequent times (hasPlayedIntro), the animation is faster (0.5s drop + expand).
+        setWindowWidth(window.innerWidth)
+        const handleResize = () => setWindowWidth(window.innerWidth)
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
-            const duration = hasPlayedIntro ? 600 : 1800;
 
-            const timer = setTimeout(() => {
-                setHasEntered(true)
-                if (!hasPlayedIntro) setHasPlayedIntro(true)
-            }, duration)
-            return () => clearTimeout(timer)
-        }
-    }, [isVisible, hasPlayedIntro])
 
-    const links = [
+    const links = useMemo<{ name: string; href: string }[]>(() => [
         { name: 'Services', href: '#services' },
         { name: 'Work', href: '#works' },
-        { name: 'About', href: '#about' },
-    ]
+        { name: 'Stack', href: '#tech-stack' },
+        { name: 'Framework', href: '#thinking-framework' },
+        { name: 'Process', href: '#process' },
+        { name: 'Edge', href: '#differentiation' },
+    ], [])
 
-    const activeLinkName = hoveredLink
+    const [activeSection, setActiveSection] = useState<string | null>(null)
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.id === 'contact' || entry.target.id === 'positioning') {
+                        setActiveSection(null)
+                    } else {
+                        const link = links.find(l => l.href.substring(1) === entry.target.id)
+                        if (link) setActiveSection(link.name)
+                    }
+                }
+            })
+        }, {
+            rootMargin: '-20% 0px -60% 0px' // Trigger when section is in the top/middle of the viewport
+        })
+
+        links.forEach(link => {
+            const el = document.getElementById(link.href.substring(1))
+            if (el) observer.observe(el)
+        })
+
+        const contactEl = document.getElementById('contact')
+        if (contactEl) observer.observe(contactEl)
+
+        const positioningEl = document.getElementById('positioning')
+        if (positioningEl) observer.observe(positioningEl)
+
+        return () => observer.disconnect()
+    }, [links])
+
+    const activeLinkName = hoveredLink || activeSection
+
+    const shouldShow = isVisible && headerPosition !== 'top-right'
 
     return (
         <div className="fixed top-6 left-0 right-0 z-50 flex justify-center pointer-events-none">
             <motion.nav
                 initial={{ y: -100, width: 20, height: 20, borderRadius: 50, opacity: 0 }}
                 animate={{
-                    y: isVisible ? (
-                        !hasPlayedIntro ? [
-                            -100, // Start
-                            0,    // Drop
-                            -40,  // Bounce 1 Up
-                            0     // Land
-                        ] : 0 // Simple Drop
-                    ) : -100,
-                    x: isVisible && !hasPlayedIntro ? [
-                        0,    // Start
-                        0,    // Wait for bounce
-                        -130, // Roll Left
-                        0     // Expand Correction
-                    ] : 0,
-                    width: isVisible ? (isExpanded ? 600 : 280) : 20,
-                    height: isVisible ? 55 : 20,
-                    borderRadius: isVisible ? 24 : 50,
-                    opacity: isVisible ? 1 : 0
+                    y: shouldShow ? 0 : -100,
+                    x: 0,
+                    width: shouldShow ? (isExpanded ? Math.max(320, Math.min(windowWidth * 0.95, 800)) : 320) : 20,
+                    height: shouldShow ? 55 : 20,
+                    borderRadius: shouldShow ? 24 : 50,
+                    opacity: shouldShow ? 1 : 0
                 }}
                 transition={{
                     y: {
-                        times: !hasPlayedIntro ? [0, 0.4, 0.7, 1] : undefined,
-                        duration: !hasPlayedIntro ? 0.8 : 0.5,
-                        type: !hasPlayedIntro ? "keyframes" : "spring",
+                        duration: 0.5,
+                        type: "spring",
                         stiffness: 100,
                         damping: 20
                     },
                     x: {
-                        times: [0, 0.47, 0.76, 1],
-                        duration: 1.7,
+                        duration: 0.5,
                         ease: "easeInOut"
                     },
-                    width: { delay: isVisible && !hasEntered ? (!hasPlayedIntro ? 1.3 : 0.5) : 0, type: "spring", stiffness: 100, damping: 20 },
-                    height: { delay: isVisible && !hasEntered ? (!hasPlayedIntro ? 1.3 : 0.5) : 0, type: "spring", stiffness: 100, damping: 20 },
-                    borderRadius: { delay: isVisible && !hasEntered ? (!hasPlayedIntro ? 1.3 : 0.5) : 0, duration: 0.3 },
+                    width: { delay: shouldShow ? 0.3 : 0, type: "spring", stiffness: 100, damping: 20 },
+                    height: { delay: shouldShow ? 0.3 : 0, type: "spring", stiffness: 100, damping: 20 },
+                    borderRadius: { delay: shouldShow ? 0.3 : 0, duration: 0.3 },
                     opacity: { duration: 0.2 }
                 }}
                 onMouseEnter={() => setIsExpanded(true)}
@@ -110,16 +124,33 @@ export function DynamicIsland() {
                 <motion.div
                     className="flex w-full items-center justify-between"
                     initial={{ opacity: 0 }}
-                    animate={{ opacity: isVisible ? 1 : 0 }}
-                    transition={{ delay: isVisible ? (hasPlayedIntro ? 0.7 : 1.5) : 0, duration: 0.3 }} // Fast reveal if intro done
+                    animate={{ opacity: shouldShow ? 1 : 0 }}
+                    transition={{ delay: shouldShow ? 0.5 : 0, duration: 0.3 }} // Reveal after drop/expand
                 >
                     {/* LOGO AREA */}
-                    <div className="flex items-center shrink-0">
+                    <div className="flex items-center shrink-0 min-w-[120px]">
                         <a
                             href="#"
-                            className="font-mono text-white font-black uppercase tracking-[0.2em] text-[10px] md:text-xs hover:text-cyan-400 transition-colors cursor-none whitespace-nowrap pl-4 pr-2 no-cursor-magnify"
+                            className="font-mono text-white font-black uppercase tracking-[0.2em] text-[10px] md:text-xs hover:text-cyan-400 transition-colors cursor-none whitespace-nowrap pl-4 pr-2 no-cursor-magnify relative flex items-center h-[30px]"
                         >
-                            Console Logs
+                            <AnimatePresence mode="wait">
+                                <motion.span
+                                    key={(!isExpanded && activeSection) ? activeSection : "logo"}
+                                    initial={{ y: 8, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    exit={{ y: -8, opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="absolute left-4 whitespace-nowrap"
+                                >
+                                    {(!isExpanded && activeSection) ? (
+                                        <span className="text-cyan-400">{activeSection}</span>
+                                    ) : "Console Logs"}
+                                </motion.span>
+                            </AnimatePresence>
+                            {/* Invisible dummy text to maintain dynamic width if needed, though width is currently fixed for the container logic */}
+                            <span className="opacity-0 pointer-events-none whitespace-nowrap">
+                                {(!isExpanded && activeSection) ? activeSection : "Console Logs"}
+                            </span>
                         </a>
                     </div>
 

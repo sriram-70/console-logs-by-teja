@@ -371,17 +371,27 @@ export async function POST(req: NextRequest) {
 </html>`;
 
     // ─── DUAL DISPATCH via Promise.all ───────────────────────────────────────
+    //
+    // TODO: Once tejasriram.live is verified at resend.com/domains:
+    //   1. Change `from` to 'hello@tejasriram.live' on both emails
+    //   2. Change client receipt `to` back to: email  (the form submitter)
+    //   3. Remove the "(FOR: ...)" prefix from the client subject line
+    //
+    // CURRENT MODE — Resend sandbox: can only send to verified owner address.
+    // Client's email is captured in the subject so you can reply to them manually.
+    const OWNER_EMAIL = 'tejasriramungarala@gmail.com';
+
     const [internalResult, clientResult] = await Promise.all([
       resend.emails.send({
         from: 'onboarding@resend.dev',
-        to: 'tejasriramungarala@gmail.com',
+        to: OWNER_EMAIL,
         subject: `[SYSTEM LOG] New transmission from ${name} — ${PROJECT_TYPE_MAP[type] || type}`,
         html: internalHtml,
       }),
       resend.emails.send({
         from: 'onboarding@resend.dev',
-        to: email,
-        subject: 'INITIALIZATION SUCCESSFUL. // CONSOLE LOGS',
+        to: OWNER_EMAIL, // ← swap to `email` once domain is verified
+        subject: `[CLIENT COPY — FOR: ${email}] INITIALIZATION SUCCESSFUL. // CONSOLE LOGS`,
         html: clientHtml,
       }),
     ]);

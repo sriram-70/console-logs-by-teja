@@ -135,7 +135,10 @@ export function Process() {
 
             {/* STICKY HEADER (Properly spaced below dynamic island, perfectly left aligned) */}
             <div className="absolute top-[12vh] md:top-[15vh] left-0 w-full px-8 md:pl-[5vw] md:pr-[5vw] z-50 pointer-events-none mix-blend-difference flex flex-col items-start gap-12 md:w-full">
-                <h2 className="text-[8.5vw] md:text-[6.5vw] font-black leading-[0.9] tracking-tighter text-white uppercase">
+                <h2
+                    className="font-black leading-[0.9] tracking-tighter text-white uppercase"
+                    style={{ fontSize: 'var(--fluid-heading)' }}
+                >
                     <span className="process-word inline-block will-change-[filter,opacity,transform]">INTENTIONAL —</span><br />
                     <span className="process-word inline-block text-white/40 will-change-[filter,opacity,transform]">FROM START TO LAUNCH.</span>
                 </h2>
@@ -159,7 +162,10 @@ export function Process() {
                             >
                                 [ PHASE_{phase.num} ]
                             </span>
-                            <h3 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter group-hover:text-emerald-400 transition-colors mb-3">
+                            <h3
+                                className="font-black text-white uppercase tracking-tighter group-hover:text-emerald-400 transition-colors mb-3"
+                                style={{ fontSize: 'clamp(1.5rem, 3.5vw, 3rem)' }}
+                            >
                                 {phase.title}
                             </h3>
                             <p className="text-lg md:text-xl text-white/70 leading-relaxed font-medium">
@@ -241,8 +247,29 @@ export function ProcessBackgroundLayer() {
                     ref={trackRef}
                     className="absolute top-0 left-0 h-full w-[400%] flex items-center bg-transparent will-change-transform"
                 >
-                    {/* CONTINUOUS HORIZONTAL LINE */}
-                    <div ref={lineRef} data-cursor-snap="true" className="absolute top-1/2 left-[12.5%] w-[75%] h-[2px] bg-white/20 -translate-y-1/2 origin-center"></div>
+                    {/* CONTINUOUS HORIZONTAL SPINE — SVG for infinite sharpness, GPU accelerated */}
+                    <div
+                        ref={lineRef}
+                        data-cursor-snap="true"
+                        className="kinetic-spine absolute top-1/2 left-[12.5%] w-[75%] h-[2px] -translate-y-1/2 origin-center"
+                        aria-hidden="true"
+                        style={{ willChange: 'transform, opacity' }}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="absolute inset-0 w-full h-full overflow-visible process-spine-svg"
+                            preserveAspectRatio="none"
+                            aria-hidden="true"
+                        >
+                            <line
+                                x1="0" y1="1"
+                                x2="100%" y2="1"
+                                stroke="rgba(255,255,255,0.2)"
+                                strokeWidth="1.5"
+                                vectorEffect="non-scaling-stroke"
+                            />
+                        </svg>
+                    </div>
 
                     {/* THE 4 PHASES Spread evenly */}
                     {[0, 1, 2, 3].map((i) => (

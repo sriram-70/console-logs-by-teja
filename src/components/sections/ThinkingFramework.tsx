@@ -171,26 +171,49 @@ export function ThinkingFramework() {
 
                 {/* HEADER (Scrub & Reveal) */}
                 <div ref={headerRef} className="absolute top-[5%] left-[5%] z-50 pointer-events-auto mix-blend-difference">
-                    <h2 className="text-6xl md:text-[5rem] font-black leading-[0.85] tracking-tighter text-white uppercase">
+                    <h2
+                        className="font-black leading-[0.85] tracking-tighter text-white uppercase"
+                        style={{ fontSize: 'clamp(2.5rem, 5.2vw, 5rem)' }}
+                    >
                         <span className="tf-word inline-block will-change-[filter,opacity,transform]">STRUCTURE</span><br />
                         <span className="tf-word inline-block will-change-[filter,opacity,transform] text-white/40">BEFORE STYLE.</span>
                     </h2>
                 </div>
 
-                {/* THE HORIZONTAL TO VERTICAL KINETIC LINE */}
+                {/* THE HORIZONTAL TO VERTICAL KINETIC SPINE — SVG for infinite resolution */}
                 <div
                     ref={spineRef}
                     data-cursor-snap="true"
-                    className="absolute h-[1.5px] bg-white z-10 origin-center"
+                    className="kinetic-spine absolute z-10 origin-center process-spine-svg"
+                    aria-hidden="true"
                     style={{
                         width: "100%",
+                        height: "2px",
                         top: "50%",
                         left: "50%",
                         transform: "translate(-50%, -50%)",
+                        willChange: "transform",
                         WebkitMaskImage: "linear-gradient(to right, black 0%, black calc(33.333% - var(--mask-gap, 0px)), transparent calc(33.333% - var(--mask-gap, 0px)), transparent calc(33.333% + var(--mask-gap, 0px)), black calc(33.333% + var(--mask-gap, 0px)), black 100%)",
                         maskImage: "linear-gradient(to right, black 0%, black calc(33.333% - var(--mask-gap, 0px)), transparent calc(33.333% - var(--mask-gap, 0px)), transparent calc(33.333% + var(--mask-gap, 0px)), black calc(33.333% + var(--mask-gap, 0px)), black 100%)"
                     }}
-                />
+                >
+                    {/* SVG line — crisp at every zoom level including 8K */}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="absolute inset-0 w-full h-full overflow-visible"
+                        preserveAspectRatio="none"
+                        aria-hidden="true"
+                    >
+                        <line
+                            x1="0" y1="1"
+                            x2="100%" y2="1"
+                            stroke="white"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            vectorEffect="non-scaling-stroke"
+                        />
+                    </svg>
+                </div>
 
                 {/* THE CHEVRON INDICATOR */}
                 <div
@@ -211,7 +234,7 @@ export function ThinkingFramework() {
                     Since item height is 350px (Desktop), we offset by half of that to guarantee center alignment: -175px. 
                 */}
                 <div
-                    className="absolute left-[35vw] md:left-[45vw] w-[60vw] md:w-[45vw] overflow-visible z-30 pointer-events-auto top-1/2 -translate-y-[125px] md:-translate-y-[175px]"
+                    className="timeline-spine-container absolute left-[35vw] md:left-[45vw] w-[60vw] md:w-[45vw] overflow-visible z-30 pointer-events-auto top-1/2 -translate-y-[125px] md:-translate-y-[175px]"
                 >
                     <div ref={stepsListRef} className="absolute top-0 left-0 w-full flex flex-col">
                         {steps.map((step, idx) => (
@@ -227,10 +250,16 @@ export function ThinkingFramework() {
                                         {step.num} <span className="text-white/40">//</span>
                                     </span>
                                 </div>
-                                <h3 className="text-2xl md:text-5xl font-black text-white uppercase tracking-tighter mb-2 md:mb-4">
+                                <h3
+                                    className="font-black text-white uppercase tracking-tighter mb-2 md:mb-4"
+                                    style={{ fontSize: 'clamp(1.5rem, 4vw, 3.5rem)' }}
+                                >
                                     {step.title}
                                 </h3>
-                                <p className="text-xs md:text-lg text-white/70 leading-relaxed font-mono whitespace-pre-line max-w-[80%]">
+                                <p
+                                    className="text-white/70 leading-relaxed font-mono whitespace-pre-line max-w-[80%]"
+                                    style={{ fontSize: 'var(--fluid-body)' }}
+                                >
                                     {step.desc}
                                 </p>
                             </div>

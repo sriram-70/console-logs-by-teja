@@ -7,12 +7,12 @@ import { Atmosphere } from '@/components/dom/Atmosphere'
 import { Instagram, Github, Mail } from 'lucide-react'
 import { useUI } from '@/context/UIContext'
 import { useScrollStore } from '@/store/useScrollStore'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ProcessBackgroundLayer } from '@/components/sections/Process'
 
 export default function Home() {
   const [footerState, setFooterState] = useState('IDLE')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const { setHeaderPosition } = useUI()
 
   // FORM STATE
@@ -47,34 +47,31 @@ export default function Home() {
     }
   };
 
-  const isProcessActive = useScrollStore((state) => state.isProcessActive) // Bind isProcessActive state
+  const isProcessActive = useScrollStore((state) => state.isProcessActive)
 
-  // Use Locomotive Scroll for smooth scrolling
+  // Smooth scroll — 120Hz compatible via GSAP ticker + native RAF
   useEffect(() => {
+    // Use the already-installed locomotive-scroll with GSAP ticker integration
     let locomotiveScroll: any
-    (async () => {
-      const LocomotiveScroll = (await import('locomotive-scroll')).default
-      locomotiveScroll = new LocomotiveScroll()
-    })()
+    let gsapModule: any
+
+      ; (async () => {
+        // Lazy-load GSAP + ScrollTrigger only after initial paint
+        gsapModule = await import('gsap')
+        const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+        gsapModule.gsap.registerPlugin(ScrollTrigger)
+
+        // Configure GSAP ticker for 120Hz displays — eliminates lag compensation
+        gsapModule.gsap.ticker.lagSmoothing(0)
+
+        // Lazy-load locomotive-scroll for smooth physics
+        const LocomotiveScroll = (await import('locomotive-scroll')).default
+        locomotiveScroll = new LocomotiveScroll()
+      })()
 
     return () => {
       if (locomotiveScroll) locomotiveScroll.destroy()
     }
-  }, [])
-
-  // Setup GSAP matchMedia for responsive animations outside R3F
-  useEffect(() => {
-    let ctx = gsap.context(() => {
-      // Setup hero exit animation - trigger when user scrolls down
-      // Uses matchMedia to behave differently on mobile vs desktop
-      ScrollTrigger.matchMedia({
-        "(min-width: 768px)": function () {
-          // Desktop hero text animation
-        }
-      })
-    })
-
-    return () => ctx.revert()
   }, [])
 
 
@@ -178,18 +175,38 @@ export default function Home() {
 
 
 
-              <form className="flex flex-col gap-6 mt-0 relative" onSubmit={(e) => {
+              <form className="flex flex-col gap-6 mt-0 relative" onSubmit={async (e) => {
                 e.preventDefault();
-                // Only submit if on step 2
-                if (formStep === 2) {
-                  setFooterState('BLACKOUT');
-                  setHeaderPosition('center');
-                  setTimeout(() => {
-                    window.scrollTo(0, 0);
-                    setFooterState('IDLE');
-                    setFormStep(1); // Reset form step
-                    setFormData({ name: '', email: '', phone: '', type: '', budget: '', timeline: '', details: '' }); // Reset form data
-                  }, 2500);
+                if (formStep !== 2) return;
+
+                setIsSubmitting(true);
+                setSubmitError(null);
+
+                try {
+                  const res = await fetch('/api/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                  });
+                  const data = await res.json();
+
+                  if (data.status === 'SYSTEM_READY') {
+                    setFooterState('SYSTEM_READY');
+                    setHeaderPosition('center');
+                    // Auto-reset after cinematic display
+                    setTimeout(() => {
+                      window.scrollTo(0, 0);
+                      setFooterState('IDLE');
+                      setFormStep(1);
+                      setFormData({ name: '', email: '', phone: '', type: '', budget: '', timeline: '', details: '' });
+                    }, 5000);
+                  } else {
+                    setSubmitError(data.error || 'TRANSMISSION FAILED. PLEASE RETRY.');
+                  }
+                } catch {
+                  setSubmitError('CONNECTION ERROR. CHECK YOUR NETWORK AND RETRY.');
+                } finally {
+                  setIsSubmitting(false);
                 }
               }}>
 
@@ -316,21 +333,70 @@ export default function Home() {
                     <button
                       suppressHydrationWarning
                       type="submit"
-                      className="w-2/3 bg-black text-white py-6 font-black text-xl uppercase tracking-wider hover:bg-violet-600 transition-colors cursor-none"
+                      disabled={isSubmitting}
+                      className="w-2/3 bg-black text-white py-6 font-black text-xl uppercase tracking-wider hover:bg-violet-600 transition-colors cursor-none disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      GET A QUOTE
+                      {isSubmitting ? 'TRANSMITTING...' : 'GET A QUOTE'}
                     </button>
                   </div>
                 </div>
+
+                {/* Submission Error */}
+                {submitError && (
+                  <p className="mt-2 text-red-500 font-mono text-sm uppercase tracking-widest text-center">
+                    ⚠ {submitError}
+                  </p>
+                )}
               </form>
             </div>
           </div>
 
-          {/* 4. THE BLACKOUT (Solid Black) */}
-          <div className={`fixed inset-0 bg-black z-70 flex items-center justify-center transition-opacity duration-300 ${footerState === 'BLACKOUT' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <h2 className="text-4xl font-mono text-white animate-pulse">
-              SYSTEM LINKED // THANK YOU
-            </h2>
+          {/* 4. SYSTEM_READY — Cinematic Transmission Complete Screen */}
+          <div className={`fixed inset-0 bg-black z-9999 flex flex-col items-center justify-center transition-opacity duration-700 ease-in-out ${footerState === 'SYSTEM_READY' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}>
+            {/* Scanline overlay */}
+            <div className="absolute inset-0 pointer-events-none" style={{
+              backgroundImage: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 4px)',
+            }} />
+
+            <div className="relative z-10 flex flex-col items-center gap-10 px-8 text-center max-w-2xl">
+
+              {/* Status Badge */}
+              <div className="flex items-center gap-3">
+                <span className="inline-block w-2 h-2 rounded-full bg-white animate-ping" />
+                <span className="font-mono text-xs tracking-[0.5em] text-white/40 uppercase">CONSOLE LOGS // DUAL DISPATCH</span>
+              </div>
+
+              {/* Main Headline */}
+              <div className="space-y-2">
+                <h2 className="font-mono text-5xl md:text-7xl font-black text-white tracking-tighter leading-none">
+                  TRANSMISSION
+                </h2>
+                <h2 className="font-mono text-5xl md:text-7xl font-black text-white/20 tracking-tighter leading-none">
+                  COMPLETE.
+                </h2>
+              </div>
+
+              {/* Log Lines */}
+              <div className="w-full border border-white/10 bg-white/5 p-6 text-left space-y-3 font-mono">
+                <p className="text-xs text-white/40 tracking-widest uppercase mb-4">// SYSTEM LOG</p>
+                <p className="text-sm text-white/60"><span className="text-white/30">[01]</span> INTERNAL BRIEF ─────────── <span className="text-white">DISPATCHED ✓</span></p>
+                <p className="text-sm text-white/60"><span className="text-white/30">[02]</span> CLIENT RECEIPT ──────────── <span className="text-white">DISPATCHED ✓</span></p>
+                <p className="text-sm text-white/60"><span className="text-white/30">[03]</span> STATUS ───────────────────── <span className="text-white">SYSTEM_READY</span></p>
+              </div>
+
+              {/* Brand Signature */}
+              <div className="space-y-1">
+                <p className="font-mono text-xs text-white/20 tracking-[0.4em] uppercase">From the desk of</p>
+                <p className="text-white font-black text-lg tracking-tight">SO, I AM YOUR DEVELOPER ARTIST.</p>
+                <p className="font-mono text-xs text-white/30 tracking-widest">Clear by Design. Designed to Convert.</p>
+              </div>
+
+              {/* Auto-close hint */}
+              <p className="font-mono text-[10px] text-white/15 tracking-[0.3em] uppercase animate-pulse">
+                AUTO-CLOSING IN 5s —— CHECK YOUR INBOX
+              </p>
+            </div>
           </div>
 
         </footer>

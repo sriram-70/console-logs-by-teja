@@ -1,25 +1,153 @@
 @import "tailwindcss";
 
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
 :root {
   --background: #000000;
   --foreground: #ffffff;
+  --accent-gold: #ffd700;
+  --accent-cyan: #22d3ee;
+  --font-inter: 'Inter', sans-serif;
+  --font-space: 'Space Grotesk', sans-serif;
+
+  /* Fluid typography scale — clamp(MIN, PREFERRED, MAX) */
+  /* Hero title: 56px mobile → 14vw → 220px 8K */
+  --fluid-hero: clamp(3.5rem, 14vw, 13.75rem);
+  /* Section heading: 32px mobile → 6.5vw → 104px */
+  --fluid-heading: clamp(2rem, 6.5vw, 6.5rem);
+  /* Sub-heading: 24px mobile → 4vw → 64px */
+  --fluid-subheading: clamp(1.5rem, 4vw, 4rem);
+  /* Body large: 18px mobile → 1.5vw → 24px */
+  --fluid-body-lg: clamp(1.125rem, 1.5vw, 1.5rem);
+  /* Body base: 14px mobile → 1.1vw → 18px */
+  --fluid-body: clamp(0.875rem, 1.1vw, 1.125rem);
+  /* Caption: 10px mobile → 0.75vw → 14px */
+  --fluid-caption: clamp(0.625rem, 0.75vw, 0.875rem);
+}
+
+/* ============================================================
+   BASE RESET & BODY
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Enable native smooth scroll with overscroll control */
+  scroll-behavior: smooth;
+  overscroll-behavior: none;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
   margin: 0;
   padding: 0;
   cursor: none;
-  /* Hide default cursor */
   -ms-overflow-style: none;
-  /* IE and Edge */
   scrollbar-width: none;
-  /* Firefox */
+  /* Prevent layout shift from scrollbar appearing */
+  overflow-y: scroll;
+  /* Promote to GPU layer for consistent compositing */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
+/* ============================================================
+   FLUID TYPOGRAPHY UTILITIES
+   ============================================================ */
+.fluid-hero {
+  font-size: var(--fluid-hero);
+}
+
+.fluid-heading {
+  font-size: var(--fluid-heading);
+}
+
+.fluid-subheading {
+  font-size: var(--fluid-subheading);
+}
+
+.fluid-body-lg {
+  font-size: var(--fluid-body-lg);
+}
+
+.fluid-body {
+  font-size: var(--fluid-body);
+}
+
+.fluid-caption {
+  font-size: var(--fluid-caption);
+}
+
+/* ============================================================
+   PERFORMANCE: GPU ACCELERATION
+   ============================================================ */
+
+/* Kinetic spine — GPU accelerated so animation never drops frames */
+.kinetic-spine {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* All GSAP-animated elements benefit from GPU layer promotion */
+.will-change-transform {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* 3D blob aspect-ratio containers — Zero CLS */
+.blob-container {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 600px;
+  contain: strict;
+}
+
+/* Fixed aspect-ratio for R3F canvas to prevent CLS */
+.canvas-container {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  contain: layout style;
+}
+
+/* ============================================================
+   SCROLLBAR HIDE
+   ============================================================ */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================
+   INTERACTIVE ELEMENT CURSOR OVERRIDE
+   ============================================================ */
+a,
+button,
+input,
+textarea,
+select,
+[role="button"] {
+  cursor: none;
+}
+
+/* ============================================================
+   CANVAS TOUCH ACTION
+   ============================================================ */
+canvas {
+  touch-action: none;
+}
+
+/* ============================================================
+   MARQUEE ANIMATIONS
+   ============================================================ */
 @keyframes marquee {
   0% {
     transform: translateX(0%);
@@ -42,12 +170,17 @@ body {
 
 .animate-marquee {
   animation: marquee 25s linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee-reverse {
   animation: marquee-reverse 25s linear infinite;
+  will-change: transform;
 }
 
+/* ============================================================
+   TERMINAL BLINK
+   ============================================================ */
 @keyframes terminal-prompt-blink {
 
   0%,
@@ -65,22 +198,9 @@ body {
   animation: terminal-prompt-blink 1s steps(1, end) infinite;
 }
 
-::-webkit-scrollbar {
-  display: none;
-}
-
-a,
-button,
-input,
-[role="button"] {
-  cursor: none;
-  /* Ensure interactive elements don't show pointer */
-}
-
-canvas {
-  touch-action: none;
-}
-
+/* ============================================================
+   KINETIC LINE TRACE
+   ============================================================ */
 @keyframes trace {
   0% {
     transform: translateX(-100%);
@@ -89,4 +209,183 @@ canvas {
   100% {
     transform: translateX(100%);
   }
+}
+
+/* ============================================================
+   SHAKE ANIMATION (Footer trigger)
+   ============================================================ */
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0) scale(1.1);
+  }
+
+  20% {
+    transform: translateX(-6px) scale(1.1);
+  }
+
+  40% {
+    transform: translateX(6px) scale(1.1);
+  }
+
+  60% {
+    transform: translateX(-4px) scale(1.1);
+  }
+
+  80% {
+    transform: translateX(4px) scale(1.1);
+  }
+}
+
+/* ============================================================
+   GSAP SCROLL SMOOTHER — 120Hz OPTIMIZATION
+   ============================================================ */
+#smooth-wrapper {
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+}
+
+#smooth-content {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* ============================================================
+   LENIS SMOOTH SCROLL — 120Hz SUPPORT
+   ============================================================ */
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* ============================================================
+   PROCESS SECTION — KINETIC SPINE SVG OPTIMIZATION
+   ============================================================ */
+.process-spine-svg {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Allow browser to predictively composite */
+  contain: layout style;
+}
+
+/* ============================================================
+   3D BLOB ZERO-CLS CONTAINER
+   The fixed aspect-ratio prevents any Cumulative Layout Shift
+   when the Three.js canvas loads asynchronously.
+   ============================================================ */
+.r3f-scene-wrapper {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  /* Fixed positioning prevents CLS entirely */
+  contain: strict;
+}
+
+/* ============================================================
+   TOUCH-SAFE MOBILE LAYOUTS
+   ============================================================ */
+@media (max-width: 767px) {
+
+  /* Timeline spine vertical stacking */
+  .timeline-spine-container {
+    flex-direction: column;
+    padding-left: clamp(1rem, 5vw, 2rem);
+    padding-right: clamp(1rem, 5vw, 2rem);
+  }
+
+  /* Section "01 // CLARITY" — vertical stack */
+  .clarity-section {
+    flex-direction: column;
+    gap: clamp(1.5rem, 6vw, 3rem);
+    padding: clamp(1rem, 6vw, 3rem) clamp(1rem, 5vw, 2rem);
+  }
+
+  /* Touch-safe minimum tap target: 44×44px */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent overflow on mobile for large headlines */
+  .fluid-hero {
+    font-size: clamp(2.5rem, 14vw, 5rem);
+    line-height: 0.85;
+  }
+}
+
+/* ============================================================
+   HIGH REFRESH RATE DISPLAY SUPPORT
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* Allow motion for users who are OK with it */
+  .kinetic-spine,
+  .animate-marquee,
+  .animate-marquee-reverse {
+    will-change: transform;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  /* Respect user preference — kill animations */
+  .animate-marquee,
+  .animate-marquee-reverse,
+  .kinetic-spine {
+    animation: none;
+    will-change: auto;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   GLASSMORPHISM UTILITY
+   ============================================================ */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================================
+   FOCUS VISIBLE — ACCESSIBILITY
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ============================================================
+   SELECTION STYLE
+   ============================================================ */
+::selection {
+  background: var(--accent-cyan);
+  color: #000;
 }

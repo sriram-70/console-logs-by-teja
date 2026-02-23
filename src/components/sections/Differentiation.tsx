@@ -119,7 +119,10 @@ export function Differentiation() {
 
                 {/* THE MASSIVE INTRO HEADER */}
                 <div ref={headerBlockRef} className="absolute top-[20vh] left-[5vw] w-full px-8 md:pl-[5vw] pr-[5vw] will-change-transform pointer-events-auto">
-                    <h2 className="text-[10vw] md:text-[8vw] font-black leading-[0.85] tracking-tighter text-white uppercase mix-blend-difference">
+                    <h2
+                        className="font-black leading-[0.85] tracking-tighter text-white uppercase mix-blend-difference"
+                        style={{ fontSize: 'clamp(3rem, 8vw, 9rem)' }}
+                    >
                         <span className="diff-word inline-block will-change-[filter,opacity,transform]">DIRECT. FOCUSED.</span><br />
                         <span className="diff-word inline-block text-white/40 will-change-[filter,opacity,transform]">ACCOUNTABLE.</span>
                     </h2>
@@ -165,7 +168,14 @@ export function Differentiation() {
                         So, I am your
                     </p>
                     <div className="overflow-visible py-4 md:py-8 px-4 text-center">
-                        <h3 ref={artistTitleRef} style={{ fontFamily: 'var(--font-signature)' }} className="text-[5.5rem] md:text-[13rem] font-normal text-transparent bg-clip-text bg-linear-to-r from-emerald-300 via-cyan-400 to-blue-500 capitalize tracking-normal leading-[1.1] will-change-[filter,transform] -rotate-3">
+                        <h3
+                            ref={artistTitleRef}
+                            style={{
+                                fontFamily: 'var(--font-signature)',
+                                fontSize: 'clamp(4rem, 13vw, 13rem)'
+                            }}
+                            className="font-normal text-transparent bg-clip-text bg-linear-to-r from-emerald-300 via-cyan-400 to-blue-500 capitalize tracking-normal leading-[1.1] will-change-[filter,transform] -rotate-3"
+                        >
                             Developer Artist
                         </h3>
                     </div>

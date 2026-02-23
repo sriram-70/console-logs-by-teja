@@ -1,31 +1,40 @@
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // Map raw form values to readable labels
 const PROJECT_TYPE_MAP: Record<string, string> = {
-    landing: 'Landing Page',
-    business: 'Business Website (Multi-page)',
-    portfolio: 'Portfolio Site',
-    event: 'Event Page',
-    other: 'Other',
+  landing: 'Landing Page',
+  business: 'Business Website (Multi-page)',
+  portfolio: 'Portfolio Site',
+  event: 'Event Page',
+  other: 'Other',
 };
 
 const TIMELINE_MAP: Record<string, string> = {
-    urgent: 'ASAP (Rush Fee)',
-    '1week': '1-2 Weeks',
-    '2weeks': '2-4 Weeks',
-    flexible: 'Flexible',
+  urgent: 'ASAP (Rush Fee)',
+  '1week': '1-2 Weeks',
+  '2weeks': '2-4 Weeks',
+  flexible: 'Flexible',
 };
 
 export async function POST(req: NextRequest) {
-    try {
-        const body = await req.json();
-        const { name, email, phone, type, timeline, details } = body;
+  // Instantiate inside the handler — avoids build-time evaluation failure
+  // when RESEND_API_KEY is not present in the build environment.
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json(
+      { status: 'SYSTEM_ERROR', error: 'Email service not configured.' },
+      { status: 500 }
+    );
+  }
+  const resend = new Resend(apiKey);
 
-        // ─── EMAIL 1: INTERNAL SYSTEM LOG (to Developer) ────────────────────────
-        const internalHtml = `
+  try {
+    const body = await req.json();
+    const { name, email, phone, type, timeline, details } = body;
+
+    // ─── EMAIL 1: INTERNAL SYSTEM LOG (to Developer) ────────────────────────
+    const internalHtml = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -162,8 +171,8 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`;
 
-        // ─── EMAIL 2: CLIENT RECEIPT (High-Aesthetic B&W) ────────────────────────
-        const clientHtml = `
+    // ─── EMAIL 2: CLIENT RECEIPT (High-Aesthetic B&W) ────────────────────────
+    const clientHtml = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -361,34 +370,34 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`;
 
-        // ─── DUAL DISPATCH via Promise.all ───────────────────────────────────────
-        const [internalResult, clientResult] = await Promise.all([
-            resend.emails.send({
-                from: 'onboarding@resend.dev',
-                to: 'tejasriramungarala@gmail.com',
-                subject: `[SYSTEM LOG] New transmission from ${name} — ${PROJECT_TYPE_MAP[type] || type}`,
-                html: internalHtml,
-            }),
-            resend.emails.send({
-                from: 'onboarding@resend.dev',
-                to: email,
-                subject: 'INITIALIZATION SUCCESSFUL. // CONSOLE LOGS',
-                html: clientHtml,
-            }),
-        ]);
+    // ─── DUAL DISPATCH via Promise.all ───────────────────────────────────────
+    const [internalResult, clientResult] = await Promise.all([
+      resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: 'tejasriramungarala@gmail.com',
+        subject: `[SYSTEM LOG] New transmission from ${name} — ${PROJECT_TYPE_MAP[type] || type}`,
+        html: internalHtml,
+      }),
+      resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: email,
+        subject: 'INITIALIZATION SUCCESSFUL. // CONSOLE LOGS',
+        html: clientHtml,
+      }),
+    ]);
 
-        // Check for errors from Resend
-        if (internalResult.error || clientResult.error) {
-            const errMsg = internalResult.error?.message || clientResult.error?.message;
-            console.error('[SEND_ERROR]', errMsg);
-            return NextResponse.json({ status: 'SYSTEM_ERROR', error: errMsg }, { status: 500 });
-        }
-
-        return NextResponse.json({ status: 'SYSTEM_READY' }, { status: 200 });
-
-    } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Unknown error';
-        console.error('[API_ERROR]', message);
-        return NextResponse.json({ status: 'SYSTEM_ERROR', error: message }, { status: 500 });
+    // Check for errors from Resend
+    if (internalResult.error || clientResult.error) {
+      const errMsg = internalResult.error?.message || clientResult.error?.message;
+      console.error('[SEND_ERROR]', errMsg);
+      return NextResponse.json({ status: 'SYSTEM_ERROR', error: errMsg }, { status: 500 });
     }
+
+    return NextResponse.json({ status: 'SYSTEM_READY' }, { status: 200 });
+
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[API_ERROR]', message);
+    return NextResponse.json({ status: 'SYSTEM_ERROR', error: message }, { status: 500 });
+  }
 }

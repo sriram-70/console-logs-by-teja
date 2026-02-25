@@ -12,7 +12,8 @@ function HoverPortrait({ src, alt }: { src: string; alt: string }) {
                 alt={alt}
                 width={250}
                 height={300}
-                quality={90}
+                quality={85}
+                sizes="(max-width: 640px) 200px, 250px"
                 className="w-full h-auto object-contain -mb-6"
                 loading="lazy"
             />
@@ -26,7 +27,8 @@ export function Hero() {
     return (
         <section
             id="hero"
-            className="h-screen w-full flex flex-col items-center justify-between p-6 md:p-12 relative cursor-none overflow-hidden"
+            className="h-screen w-full flex flex-col items-center justify-between relative cursor-none overflow-hidden"
+            style={{ padding: 'max(1.5rem, env(safe-area-inset-top, 1.5rem)) 1.5rem 1.5rem', paddingInline: 'clamp(1.5rem, 3vw, 3rem)' }}
             aria-label="Hero section"
         >
             {/* TOP BAR */}
@@ -143,10 +145,10 @@ export function Hero() {
                 </div>
 
                 {/* CTAs */}
-                <div className="flex gap-3 sm:gap-8 justify-center mt-8 md:mt-12 cursor-pointer pointer-events-auto flex-wrap">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 justify-center mt-8 md:mt-12 cursor-pointer pointer-events-auto w-full sm:w-auto px-4 sm:px-0">
                     <a
                         href="#contact"
-                        className="px-5 py-3 sm:px-8 sm:py-4 bg-white text-black font-black uppercase tracking-widest hover:bg-cyan-400 hover:text-black transition-all duration-300 hover:scale-105"
+                        className="w-full sm:w-auto text-center px-5 py-3 sm:px-8 sm:py-4 bg-white text-black font-black uppercase tracking-widest hover:bg-cyan-400 hover:text-black transition-all duration-300 sm:hover:scale-105"
                         style={{ fontSize: 'var(--fluid-caption)' }}
                         aria-label="Get a project quote"
                     >
@@ -154,7 +156,7 @@ export function Hero() {
                     </a>
                     <a
                         href="#works"
-                        className="px-5 py-3 sm:px-8 sm:py-4 border-2 border-white/50 text-white font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300 hover:scale-105"
+                        className="w-full sm:w-auto text-center px-5 py-3 sm:px-8 sm:py-4 border-2 border-white/50 text-white font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-300 sm:hover:scale-105"
                         style={{ fontSize: 'var(--fluid-caption)' }}
                         aria-label="View project work"
                     >

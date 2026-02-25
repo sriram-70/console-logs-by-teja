@@ -129,7 +129,18 @@ const jsonLd = {
         'React',
         'Next.js',
         'Three.js',
+        'GSAP',
+        'Conversion Rate Optimization',
       ],
+      knowsLanguage: ['en', 'te'],
+      makesOffer: {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Conversion-Focused Web Development',
+          description: 'Landing pages, portfolio sites, and digital experiences designed for clarity and results.',
+        },
+      },
     },
     {
       '@type': 'WebSite',

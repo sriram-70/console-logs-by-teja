@@ -175,22 +175,22 @@ export function Value() {
     return (
         <section ref={sectionRef} id="services" className="relative h-[400vh] z-40 pointer-events-none">
             <div className="sticky top-0 h-screen overflow-hidden">
-                <div className="absolute left-[54%] md:left-[55%] top-1/2 -translate-x-1/2 -translate-y-1/2 h-[60vh] w-px z-80">
+                <div className="absolute left-6 md:left-[55%] top-1/2 md:-translate-x-1/2 -translate-y-1/2 h-[60vh] w-px z-[80]">
                     <div className="absolute inset-0 w-px bg-white/10" />
                     <div ref={fillRef} className="absolute bottom-0 left-0 w-px bg-[#00F2FF]" />
                 </div>
 
                 <h2
-                    className="absolute left-[5vw] top-1/2 -translate-y-1/2 z-[90] text-[11vw] md:text-[6vw] font-black leading-[0.83] text-white uppercase"
+                    className="absolute left-6 md:left-[5vw] top-[15vh] md:top-1/2 md:-translate-y-1/2 z-[90] text-[14vw] sm:text-[11vw] md:text-[6vw] font-black leading-[0.83] text-white uppercase"
                     style={{ color: '#FFFFFF', letterSpacing: '-0.05em' }}
                 >
                     <span className="value-word inline-block will-change-[filter,opacity,transform]">CLARITY DRIVES</span><br />
                     <span className="value-word inline-block will-change-[filter,opacity,transform]">CONVERSION.</span>
                 </h2>
 
-                <div className="grid h-full grid-cols-1 md:grid-cols-[42%_58%] px-8 md:px-[5vw]">
-                    <div />
-                    <div className="relative flex items-center justify-end pl-[16vw] md:pl-[18vw] pr-[2vw]">
+                <div className="grid h-full grid-cols-1 md:grid-cols-[42%_58%] px-0 md:px-[5vw]">
+                    <div className="hidden md:block" />
+                    <div className="relative flex flex-col md:flex-row items-center justify-center md:justify-end pl-12 sm:pl-16 md:pl-[18vw] pr-6 md:pr-[2vw] pt-[20vh] md:pt-0">
                         <div className="relative z-[95] h-[320px] w-full max-w-[34rem] pointer-events-auto">
                             {DIAGNOSTIC_POINTS.map((point, index) => (
                                 <div

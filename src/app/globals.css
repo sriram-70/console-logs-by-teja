@@ -11,18 +11,25 @@
   --font-inter: 'Inter', sans-serif;
   --font-space: 'Space Grotesk', sans-serif;
 
-  /* Fluid typography scale — clamp(MIN, PREFERRED, MAX) */
-  /* Hero title: 56px mobile → 14vw → 220px 8K */
-  --fluid-hero: clamp(3.5rem, 14vw, 13.75rem);
-  /* Section heading: 32px mobile → 6.5vw → 104px */
-  --fluid-heading: clamp(2rem, 6.5vw, 6.5rem);
-  /* Sub-heading: 24px mobile → 4vw → 64px */
-  --fluid-subheading: clamp(1.5rem, 4vw, 4rem);
-  /* Body large: 18px mobile → 1.5vw → 24px */
-  --fluid-body-lg: clamp(1.125rem, 1.5vw, 1.5rem);
-  /* Body base: 14px mobile → 1.1vw → 18px */
+  /* Safe-Area Insets — Dynamic Island / Notch avoidance */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Fluid typography scale — clamp(MIN, PREFERRED, MAX)
+     Mathematically calibrated: iPhone Mini (375px) → 8K projector (7680px) */
+  /* Hero title: 44px → 12vw → 220px */
+  --fluid-hero: clamp(2.75rem, 12vw, 13.75rem);
+  /* Section heading: 32px → 8vw → 104px */
+  --fluid-heading: clamp(2rem, 8vw, 6.5rem);
+  /* Sub-heading: 24px → 5vw → 64px */
+  --fluid-subheading: clamp(1.5rem, 5vw, 4rem);
+  /* Body large: 16px → 1.5vw → 24px */
+  --fluid-body-lg: clamp(1rem, 1.5vw, 1.5rem);
+  /* Body base: 14px → 1.1vw → 18px */
   --fluid-body: clamp(0.875rem, 1.1vw, 1.125rem);
-  /* Caption: 10px mobile → 0.75vw → 14px */
+  /* Caption: 10px → 0.75vw → 14px */
   --fluid-caption: clamp(0.625rem, 0.75vw, 0.875rem);
 }
 
@@ -39,6 +46,8 @@ html {
   /* Enable native smooth scroll with overscroll control */
   scroll-behavior: smooth;
   overscroll-behavior: none;
+  /* Allow edge-to-edge rendering on notched devices */
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -95,6 +104,9 @@ body {
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  contain: layout style;
+  isolation: isolate;
 }
 
 /* All GSAP-animated elements benefit from GPU layer promotion */
@@ -293,6 +305,26 @@ html.lenis {
 }
 
 /* ============================================================
+   SAFE-AREA INTELLIGENCE — iOS Dynamic Island / Notch
+   ============================================================ */
+@supports (padding: env(safe-area-inset-top)) {
+
+  /* Elements that need safe-area awareness */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-area-x {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+}
+
+/* ============================================================
    TOUCH-SAFE MOBILE LAYOUTS
    ============================================================ */
 @media (max-width: 767px) {
@@ -311,7 +343,7 @@ html.lenis {
     padding: clamp(1rem, 6vw, 3rem) clamp(1rem, 5vw, 2rem);
   }
 
-  /* Touch-safe minimum tap target: 44×44px */
+  /* Touch-safe minimum tap target: 44×44px (iOS + Android HIG) */
   button,
   a,
   [role="button"] {
@@ -319,10 +351,28 @@ html.lenis {
     min-width: 44px;
   }
 
+  /* Safe-area padding for edge-to-edge layouts */
+  body {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
   /* Prevent overflow on mobile for large headlines */
   .fluid-hero {
     font-size: clamp(2.5rem, 14vw, 5rem);
     line-height: 0.85;
+  }
+}
+
+/* ============================================================
+   ULTRA-WIDE & 8K DISPLAY SUPPORT
+   ============================================================ */
+@media (min-width: 3840px) {
+  :root {
+    --fluid-hero: clamp(10rem, 12vw, 13.75rem);
+    --fluid-heading: clamp(5rem, 6vw, 6.5rem);
+    --fluid-body-lg: clamp(1.25rem, 1.5vw, 1.5rem);
+    --fluid-body: clamp(1rem, 1.1vw, 1.125rem);
   }
 }
 

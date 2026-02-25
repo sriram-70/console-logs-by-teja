@@ -119,15 +119,15 @@ export function Overlay() {
             <Positioning />
             <Value />
 
-            <section ref={worksSectionRef} id="works" className="min-h-screen flex items-center justify-end px-8 md:pl-[5vw] md:pr-[5vw] relative z-20 pointer-events-none mb-12">
+            <section ref={worksSectionRef} id="works" className="min-h-screen flex items-center justify-end px-4 sm:px-8 md:pl-[5vw] md:pr-[5vw] relative z-20 pointer-events-none mb-12">
                 <div className="w-full relative h-full flex flex-col items-end justify-center">
-                    <h2 className="absolute right-0 top-0 z-70 text-[11vw] md:text-[6vw] font-black leading-[0.83] tracking-tighter uppercase text-white text-right">
+                    <h2 className="absolute right-4 sm:right-8 md:right-0 top-0 z-70 text-[14vw] sm:text-[11vw] md:text-[6vw] font-black leading-[0.83] tracking-tighter uppercase text-white text-right">
                         <span className="overlay-word inline-block will-change-[filter,opacity,transform]">STRUCTURED</span><br />
                         <span className="overlay-word inline-block will-change-[filter,opacity,transform] text-white/45">OUTCOMES.</span>
                     </h2>
 
-                    <div className="flex flex-col items-end gap-12 w-full md:w-[70%] lg:w-[60%] mt-32 md:mt-48 pointer-events-auto z-95">
-                        <div className="flex flex-col w-full">
+                    <div className="flex flex-col items-end gap-12 w-full md:w-[70%] lg:w-[60%] mt-32 md:mt-48 pointer-events-auto z-[95]">
+                        <div className="flex flex-col w-full pr-4 sm:pr-8 md:pr-0">
                             {projects.map((project) => (
                                 <Link
                                     key={project.id}

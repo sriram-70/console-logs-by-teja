@@ -78,7 +78,7 @@ export function ThinkingFramework() {
                 ease: 'power2.out'
             }, 0)
 
-            const targetLeft = isDesktop ? "35vw" : "25vw";
+            const targetLeft = isDesktop ? "35vw" : "15vw";
 
             // 1. The Shift (Horizontal to Vertical Line)
             tl.to(spineRef.current, {
@@ -218,7 +218,7 @@ export function ThinkingFramework() {
                 {/* THE CHEVRON INDICATOR */}
                 <div
                     ref={indicatorRef}
-                    className="absolute z-20 flex items-center justify-center opacity-0 -translate-x-1/2 -translate-y-1/2 left-[25vw] md:left-[35vw]"
+                    className="absolute z-20 flex items-center justify-center opacity-0 -translate-x-1/2 -translate-y-1/2 left-[15vw] md:left-[35vw]"
                     style={{ top: "50%" }}
                 >
                     <div className="w-6 h-6 flex items-center justify-center relative bg-transparent">
@@ -234,7 +234,7 @@ export function ThinkingFramework() {
                     Since item height is 350px (Desktop), we offset by half of that to guarantee center alignment: -175px. 
                 */}
                 <div
-                    className="timeline-spine-container absolute left-[35vw] md:left-[45vw] w-[60vw] md:w-[45vw] overflow-visible z-30 pointer-events-auto top-1/2 -translate-y-[125px] md:-translate-y-[175px]"
+                    className="timeline-spine-container absolute left-[25vw] md:left-[45vw] w-[65vw] sm:w-[60vw] md:w-[45vw] overflow-visible z-30 pointer-events-auto top-1/2 -translate-y-[125px] md:-translate-y-[175px]"
                 >
                     <div ref={stepsListRef} className="absolute top-0 left-0 w-full flex flex-col">
                         {steps.map((step, idx) => (
@@ -252,7 +252,7 @@ export function ThinkingFramework() {
                                 </div>
                                 <h3
                                     className="font-black text-white uppercase tracking-tighter mb-2 md:mb-4"
-                                    style={{ fontSize: 'clamp(1.5rem, 4vw, 3.5rem)' }}
+                                    style={{ fontSize: 'clamp(1.5rem, 5vw, 3.5rem)' }}
                                 >
                                     {step.title}
                                 </h3>

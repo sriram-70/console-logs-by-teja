@@ -154,7 +154,7 @@ export function Process() {
                         {/* INFO REVEAL CONTAINER (Bottom center aligned, vertically balanced) */}
                         <div
                             ref={(el) => { pointsRef.current[i] = el }}
-                            className="flex flex-col items-center justify-end w-full max-w-2xl absolute bottom-[14vh] md:bottom-[16vh] left-1/2 -translate-x-1/2 px-8 pointer-events-auto text-center"
+                            className="flex flex-col items-center justify-end w-full max-w-2xl absolute bottom-[14vh] md:bottom-[16vh] left-1/2 -translate-x-1/2 px-4 sm:px-8 pointer-events-auto text-center"
                         >
                             <span
                                 className="font-mono text-sm text-cyan-400 tracking-widest mb-4 inline-block pointer-events-auto"
@@ -164,7 +164,7 @@ export function Process() {
                             </span>
                             <h3
                                 className="font-black text-white uppercase tracking-tighter group-hover:text-emerald-400 transition-colors mb-3"
-                                style={{ fontSize: 'clamp(1.5rem, 3.5vw, 3rem)' }}
+                                style={{ fontSize: 'clamp(1.5rem, 6vw, 3rem)' }}
                             >
                                 {phase.title}
                             </h3>

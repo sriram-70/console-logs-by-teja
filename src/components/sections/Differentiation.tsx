@@ -121,7 +121,7 @@ export function Differentiation() {
                 <div ref={headerBlockRef} className="absolute top-[20vh] left-[5vw] w-full px-8 md:pl-[5vw] pr-[5vw] will-change-transform pointer-events-auto">
                     <h2
                         className="font-black leading-[0.85] tracking-tighter text-white uppercase mix-blend-difference"
-                        style={{ fontSize: 'clamp(3rem, 8vw, 9rem)' }}
+                        style={{ fontSize: 'clamp(2rem, 10vw, 9rem)' }}
                     >
                         <span className="diff-word inline-block will-change-[filter,opacity,transform]">DIRECT. FOCUSED.</span><br />
                         <span className="diff-word inline-block text-white/40 will-change-[filter,opacity,transform]">ACCOUNTABLE.</span>
@@ -135,7 +135,7 @@ export function Differentiation() {
                         {/* Left Column Statement */}
                         <div className="flex flex-col justify-center mt-32 lg:mt-0">
                             <p ref={leftTextRef} className="text-3xl md:text-[3rem] font-light text-white leading-[1.2] tracking-tight">
-                                I work independently —<br /> handling <span className="font-semibold text-white/90">strategy, structure, design, development,</span> and <span className="text-cyan-400 font-semibold italic">launch</span> <br />
+                                I work independently —<br className="hidden lg:block" /> handling <span className="font-semibold text-white/90">strategy, structure, design, development,</span> and <span className="text-cyan-400 font-semibold italic">launch</span> <br className="hidden lg:block" />
                                 from start to finish.
                             </p>
                         </div>
@@ -153,7 +153,7 @@ export function Differentiation() {
                                     className="flex items-center gap-6"
                                 >
                                     <div className="h-0.5 w-12 bg-cyan-400/50 block shadow-[0_0_10px_rgba(34,211,238,0.5)]" />
-                                    <p className="text-4xl md:text-6xl font-black tracking-tighter text-white/40 uppercase">
+                                    <p className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tighter text-white/40 uppercase">
                                         {text}
                                     </p>
                                 </div>
@@ -183,7 +183,7 @@ export function Differentiation() {
                         Clear by Design. <span className="font-semibold">Designed to Convert.</span>
                     </p>
 
-                    <div ref={finalTextRef} className="absolute bottom-[10vh] left-0 w-full px-8 md:px-[10vw] flex flex-col md:flex-row justify-between items-end">
+                    <div ref={finalTextRef} className="absolute bottom-[10vh] left-0 w-full px-8 md:px-[10vw] flex flex-col md:flex-row justify-between items-start md:items-end">
                         <div className="max-w-xl">
                             <p className="text-lg md:text-2xl text-white/80 leading-relaxed font-light">
                                 Every project is built with <span className="font-semibold text-white">focus and accountability</span>.<br />

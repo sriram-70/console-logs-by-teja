@@ -99,11 +99,11 @@ export default function Home() {
         <footer id="contact" className="min-h-screen relative flex flex-col justify-end items-center pb-0 z-10 overflow-hidden">
 
           {/* 1. SOCIALS OUTPOST (Top Right - Per Sketch) */}
-          <div className={`absolute top-10 right-[5vw] flex flex-col items-end gap-6 z-30 transition-opacity duration-300 ${footerState === 'FORM' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+          <div className={`absolute right-[5vw] flex flex-col items-end gap-6 z-30 transition-opacity duration-300 ${footerState === 'FORM' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} style={{ top: 'max(2.5rem, env(safe-area-inset-top, 2.5rem))' }}>
             {[
-              { name: 'INSTAGRAM', icon: Instagram, url: 'https://instagram.com' },
-              { name: 'GITHUB', icon: Github, url: 'https://github.com' },
-              { name: 'MAIL', icon: Mail, url: 'mailto:hello@example.com' }
+              { name: 'mycrafts.infinite', icon: Instagram, url: 'https://www.instagram.com/mycrafts.infinite' },
+              { name: 'sriram-70', icon: Github, url: 'https://github.com/sriram-70' },
+              { name: 'tejasriramungarala@gmail.com', icon: Mail, url: 'mailto:tejasriramungarala@gmail.com' }
             ].map((item) => (
               <a
                 key={item.name}
@@ -145,7 +145,7 @@ export default function Home() {
               onClick={initiateLaunch}
               suppressHydrationWarning
             >
-              <h2 className={`text-[12vw] font-black leading-none text-center transition-all duration-300 ${footerState === 'CRITICAL' ? 'text-[#FFD700] scale-110 animate-[shake_0.5s_ease-in-out_infinite]' : 'text-white mix-blend-overlay group-hover:text-[#ff3300] group-hover:mix-blend-normal group-hover:scale-105'}`}>
+              <h2 className={`text-[15vw] sm:text-[12vw] font-black leading-none text-center transition-all duration-300 ${footerState === 'CRITICAL' ? 'text-[#FFD700] scale-110 animate-[shake_0.5s_ease-in-out_infinite]' : 'text-white mix-blend-overlay group-hover:text-[#ff3300] group-hover:mix-blend-normal group-hover:scale-105'}`}>
                 START A<br />PROJECT
               </h2>
             </button>
@@ -160,7 +160,7 @@ export default function Home() {
           >
 
             {/* Form Container */}
-            <div className={`w-full max-w-xl px-8 py-24 transition-all duration-700 ${footerState === 'FORM' ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <div className={`w-full max-w-xl px-6 sm:px-8 py-16 sm:py-24 transition-all duration-700 ${footerState === 'FORM' ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
 
               {/* Back Button */}
               {/* Back Button - Only visible on Step 1 */}
@@ -212,7 +212,7 @@ export default function Home() {
 
                 {/* HEADER ROW: Title + Steps */}
                 <div className="flex justify-between items-end mb-8 border-b-2 border-black/10 pb-4">
-                  <h3 className="text-4xl md:text-5xl font-black text-black tracking-tighter m-0 leading-none uppercase">
+                  <h3 className="text-3xl sm:text-4xl md:text-5xl font-black text-black tracking-tighter m-0 leading-none uppercase">
                     {formStep === 1 ? 'YOUR DETAILS.' : 'PROJECT BRIEF.'}
                   </h3>
 
@@ -232,7 +232,7 @@ export default function Home() {
                     required={formStep === 1}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full bg-transparent border-b-2 border-black/10 py-4 text-2xl text-black font-bold outline-none focus:border-black transition-colors placeholder:text-black/20"
+                    className="w-full bg-transparent border-b-2 border-black/10 py-4 text-xl sm:text-2xl text-black font-bold outline-none focus:border-black transition-colors placeholder:text-black/20"
                   />
                   <input
                     suppressHydrationWarning
@@ -241,7 +241,7 @@ export default function Home() {
                     required={formStep === 1}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-transparent border-b-2 border-black/10 py-4 text-2xl text-black font-bold outline-none focus:border-black transition-colors placeholder:text-black/20"
+                    className="w-full bg-transparent border-b-2 border-black/10 py-4 text-xl sm:text-2xl text-black font-bold outline-none focus:border-black transition-colors placeholder:text-black/20"
                   />
                   <input
                     suppressHydrationWarning
@@ -249,7 +249,7 @@ export default function Home() {
                     placeholder="PHONE NUMBER (OPTIONAL)"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full bg-transparent border-b-2 border-black/10 py-4 text-2xl text-black font-bold outline-none focus:border-black transition-colors placeholder:text-black/20"
+                    className="w-full bg-transparent border-b-2 border-black/10 py-4 text-xl sm:text-2xl text-black font-bold outline-none focus:border-black transition-colors placeholder:text-black/20"
                   />
 
                   <button
@@ -279,7 +279,7 @@ export default function Home() {
                       required={formStep === 2}
                       value={formData.type}
                       onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                      className="w-full bg-transparent border-b-2 border-black/10 py-4 text-2xl text-black font-bold outline-none focus:border-black transition-colors appearance-none"
+                      className="w-full bg-transparent border-b-2 border-black/10 py-4 text-xl sm:text-2xl text-black font-bold outline-none focus:border-black transition-colors appearance-none"
                     >
                       <option value="" disabled>PROJECT TYPE</option>
                       <option value="landing">Landing Page</option>
@@ -299,7 +299,7 @@ export default function Home() {
                       suppressHydrationWarning
                       value={formData.timeline}
                       onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-                      className="w-full bg-transparent border-b-2 border-black/10 py-4 text-2xl text-black font-bold outline-none focus:border-black transition-colors appearance-none"
+                      className="w-full bg-transparent border-b-2 border-black/10 py-4 text-xl sm:text-2xl text-black font-bold outline-none focus:border-black transition-colors appearance-none"
                     >
                       <option value="" disabled>TIMELINE</option>
                       <option value="urgent">ASAP (Rush Fee)</option>
@@ -369,10 +369,10 @@ export default function Home() {
 
               {/* Main Headline */}
               <div className="space-y-2">
-                <h2 className="font-mono text-5xl md:text-7xl font-black text-white tracking-tighter leading-none">
+                <h2 className="font-mono text-4xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter leading-none">
                   TRANSMISSION
                 </h2>
-                <h2 className="font-mono text-5xl md:text-7xl font-black text-white/20 tracking-tighter leading-none">
+                <h2 className="font-mono text-4xl sm:text-5xl md:text-7xl font-black text-white/20 tracking-tighter leading-none">
                   COMPLETE.
                 </h2>
               </div>

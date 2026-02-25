@@ -82,7 +82,7 @@ export function DynamicIsland() {
     const shouldShow = isVisible && headerPosition !== 'top-right'
 
     return (
-        <div className="fixed top-6 left-0 right-0 z-50 flex justify-center pointer-events-none">
+        <div className="fixed left-0 right-0 z-50 flex justify-center pointer-events-none" style={{ top: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))' }}>
             <motion.nav
                 initial={{ y: -100, width: 20, height: 20, borderRadius: 50, opacity: 0 }}
                 animate={{

@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk, Great_Vibes } from 'next/font/google'
 import './globals.css'
 import { ClientLayout } from '@/components/dom/ClientLayout'
 import { DynamicIsland } from '@/components/dom/DynamicIsland'
+import { ClarityTracker } from '@/components/dom/ClarityTracker'
 import { UIProvider } from '@/context/UIContext'
 
 const inter = Inter({
@@ -199,19 +200,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${signatureFont.variable}`}>
       <head>
-        {/* Microsoft Clarity */}
-        <script
-          type="text/javascript"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(c,l,a,r,i,t,y){
-                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-              })(window, document, "clarity", "script", "w0vlhbf1lr");
-            `
-          }}
-        />
         {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{
@@ -260,6 +248,9 @@ export default function RootLayout({
         <meta name="ICBM" content="12.9716, 77.5946" />
       </head>
       <body className={inter.className}>
+        {/* Microsoft Clarity Client Mount */}
+        <ClarityTracker />
+        
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

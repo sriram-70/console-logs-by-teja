@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Scene } from '@/components/canvas/Scene'
+import dynamic from 'next/dynamic'
 import { Overlay } from '@/components/dom/Overlay'
 import { Atmosphere } from '@/components/dom/Atmosphere'
+
+// Dynamically import Three.js scene to avoid SSR and reduce initial bundle size
+const Scene = dynamic(() => import('@/components/canvas/Scene').then(mod => mod.Scene), { ssr: false })
 import { Instagram, Github, Mail } from 'lucide-react'
 import { useUI } from '@/context/UIContext'
 import { useScrollStore } from '@/store/useScrollStore'

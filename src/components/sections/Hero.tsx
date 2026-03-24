@@ -27,7 +27,7 @@ export function Hero() {
     return (
         <section
             id="hero"
-            className="h-screen w-full flex flex-col items-center justify-between relative cursor-none overflow-hidden"
+            className="min-h-[100dvh] h-auto w-full flex flex-col items-center justify-between relative cursor-none overflow-hidden pb-8 sm:pb-0"
             style={{ padding: 'max(1.5rem, env(safe-area-inset-top, 1.5rem)) 1.5rem 1.5rem', paddingInline: 'clamp(1.5rem, 3vw, 3rem)' }}
             aria-label="Hero section"
         >
@@ -46,12 +46,7 @@ export function Hero() {
                 {/* HERO TITLE LOCK-UP */}
                 <div className="flex flex-col w-fit mx-auto relative">
 
-                    {/* TAGLINE ABOVE CONSOLE */}
-                    <div className="w-full flex justify-start items-end mb-[-1.5vw] z-20">
-                        <p className="text-sm md:text-xl text-white/70 font-medium tracking-wide text-left">
-                            Clear by Design. Designed to Convert.
-                        </p>
-                    </div>
+
 
                     {/* ROW 1: CONSOLE — single H1 on page */}
                     <h1
@@ -101,7 +96,9 @@ export function Hero() {
 
                                     {/* Hover portrait — lazy-loaded image doesn't block initial render */}
                                     {isHovered && (
-                                        <HoverPortrait src="/me.png" alt="Photo of Teja, Developer Artist based in Bengaluru" />
+                                        <div className="hidden sm:block">
+                                            <HoverPortrait src="/me.png" alt="Photo of Teja, Developer Artist based in Bengaluru" />
+                                        </div>
                                     )}
                                 </div>
                             </div>

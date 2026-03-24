@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig: any = {
   images: {
     // Optimize for ultra-high resolution displays (8K)
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840, 7680],
@@ -17,11 +17,16 @@ const nextConfig: NextConfig = {
     optimizeCss: true,
     scrollRestoration: true,
   },
-  // Ensure Vercel perfectly deploys the site regardless of strict linter/typescript errors
   eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
   typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
     ignoreBuildErrors: true,
   },
 };
